@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --sides: 20px;
+    --h1: 25px;
+    --margin-s: 10px;
+    --margin-m: 10px;
+    --margin-l: 20px;
+
+    @screen lg {
+      --h1: 40px;
+      --margin-s: 10px;
+      --margin-m: 20px;
+      --margin-l: 60px;
+    }
+  }
+
+  body {
+    overscroll-behavior: none;
+  }
+
+  img,
+  video,
+  svg {
+    pointer-events: none;
+    user-select: none;
+  }
+
+  *::-webkit-scrollbar {
+    width: 0;
+  }
+
+  /* ::selection {
+    color: var(--color-primary);
+    background: var(--color-accent);
+  } */
+}
