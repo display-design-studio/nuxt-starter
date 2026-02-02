@@ -8,11 +8,24 @@ export default defineNuxtConfig({
     "@nuxt/hints",
     "@nuxt/scripts",
     "@nuxtjs/sanity",
+    "@nuxtjs/i18n",
+    "@nuxtjs/seo",
   ],
   runtimeConfig: {
     sanity: {
       token: process.env.NUXT_SANITY_TOKEN,
     },
+  },
+  site: {
+    url: "https://example.com",
+    name: "My Site",
+  },
+  i18n: {
+    defaultLocale: "en",
+    locales: [
+      { code: "en", name: "English", file: "en.json" },
+      { code: "it", name: "Italian", file: "it.json" },
+    ],
   },
   sanity: {
     projectId: process.env.SANITY_PROJECT_ID,

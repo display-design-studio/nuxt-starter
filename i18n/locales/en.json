@@ -1,0 +1,6 @@
+{
+  "nuxtSiteConfig": {
+    "name": "Nuxt Starter",
+    "description": "Nuxt Starter Description"
+  }
+}
