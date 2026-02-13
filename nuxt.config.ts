@@ -41,6 +41,10 @@ export default defineNuxtConfig({
     typegen: {
       enabled: true,
       schemaTypesPath: "./studio/schemaTypes/index.ts",
+      queryPaths: [
+        "server/sanity/queries/**/*.{ts,js,mjs}",
+        "app/**/*.{vue,ts,js,mjs}",
+      ],
     },
     visualEditing: {
       token: process.env.NUXT_SANITY_TOKEN,

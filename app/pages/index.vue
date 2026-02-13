@@ -1,11 +1,5 @@
 <script setup lang="ts">
-import type { HomeQueryResult } from "#build/types/sanity-typegen";
-
-const homeQuery = groq`*[_type == "home"][0]{
-  _id,
-}`;
-
-const { data } = await useSanityQuery<HomeQueryResult>(homeQuery);
+const { data } = await useFetch("/api/home");
 </script>
 
 <template>
