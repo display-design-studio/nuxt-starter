@@ -17,7 +17,7 @@
     "@nuxtjs/i18n": "10.2.1",
     "@nuxtjs/sanity": "2.1.0",
     "@nuxtjs/seo": "3.4.0",
-    "@sanity/client": "^7.14.1",
+    "@sanity/client": "^7.15.0",
     "@tailwindcss/vite": "^4.1.18",
     "@unhead/vue": "^2.1.4",
     "eslint": "^9.39.2",
