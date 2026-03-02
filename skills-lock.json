@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "skills": {
+    "gsap": {
+      "source": "display-design-studio/skills",
+      "sourceType": "github",
+      "computedHash": "a99ad5f4138e1d9277183db781dd17b7a5bcaafb25ea9be9527831a3e05aae56"
+    },
+    "nuxt": {
+      "source": "display-design-studio/skills",
+      "sourceType": "github",
+      "computedHash": "9e8237ec92083db9a6f4c77d5e5bf4b1d9873d670671235bc75455ee1ca39c74"
+    },
+    "nuxt-sanity": {
+      "source": "display-design-studio/skills",
+      "sourceType": "github",
+      "computedHash": "4c12797ff863e1f9b1d519d90f217d8fbd25f6041ed19d5e4148553f81f8c909"
+    },
+    "nuxt-seo": {
+      "source": "display-design-studio/skills",
+      "sourceType": "github",
+      "computedHash": "daa91384a5d3738ed0d53cbfc650c5d117ce43d177d7c2d98c4b9274277a50f5"
+    },
+    "tailwind": {
+      "source": "display-design-studio/skills",
+      "sourceType": "github",
+      "computedHash": "6def58579cdde2f095b5fac36aab2ab32524a006f572b0db582e70964548650d"
+    },
+    "vite": {
+      "source": "display-design-studio/skills",
+      "sourceType": "github",
+      "computedHash": "e5bc20ba038c315f34e94264b95bd2ef7262c6a9df714c7b94d7deb25011a5f8"
+    },
+    "vue": {
+      "source": "display-design-studio/skills",
+      "sourceType": "github",
+      "computedHash": "9c241141e07e836e4f0537c63e8f929fba3767c2997250be38e699f19b75e3f2"
+    }
+  }
+}
