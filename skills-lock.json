@@ -14,7 +14,7 @@
     "nuxt-sanity": {
       "source": "display-design-studio/skills",
       "sourceType": "github",
-      "computedHash": "4c12797ff863e1f9b1d519d90f217d8fbd25f6041ed19d5e4148553f81f8c909"
+      "computedHash": "11b421ff3c3d861e292fba16bf39ac738846d8eb657fdf6802aeb3536a1fe77d"
     },
     "nuxt-seo": {
       "source": "display-design-studio/skills",
@@ -29,7 +29,7 @@
     "vite": {
       "source": "display-design-studio/skills",
       "sourceType": "github",
-      "computedHash": "e5bc20ba038c315f34e94264b95bd2ef7262c6a9df714c7b94d7deb25011a5f8"
+      "computedHash": "0293c251e4d6ff4818e8d2faed2a92f98d8d73c2f4819bd754faf93ca134d6fe"
     },
     "vue": {
       "source": "display-design-studio/skills",
