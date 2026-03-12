@@ -1,6 +1,7 @@
-import type { HomeQueryResult } from "#build/types/sanity-typegen";
+import type { HomeQueryResult } from "#sanity-types";
+import { type MaybeRef, toValue } from "vue";
 
-export const useSanityHome = (params: { lang: string }) => {
+export const useSanityHome = (params: MaybeRef<{ lang: string }>) => {
   const visualEditingState = useSanityVisualEditingState();
   const isPreview = computed(() => Boolean(visualEditingState?.enabled));
 
@@ -9,6 +10,6 @@ export const useSanityHome = (params: { lang: string }) => {
   }
 
   return useFetch<HomeQueryResult>("/api/sanity/home", {
-    query: params,
+    query: computed(() => toValue(params)),
   });
 };

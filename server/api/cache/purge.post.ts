@@ -26,12 +26,12 @@ export default defineEventHandler(async (event) => {
 
   if (body?._id) {
     await purgeCache({ tags: [body._id] });
+    await useStorage("cache").clear();
   } else {
     await purgeCache();
+    const storage = useStorage("cache");
+    await storage.clear();
   }
-
-  const storage = useStorage("cache");
-  await storage.clear();
 
   return new Response("Purged successfully!", { status: 202 });
 });

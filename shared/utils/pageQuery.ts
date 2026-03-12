@@ -9,6 +9,6 @@
  *
  * @returns `PageQueryResult` — full page document or `null` if not found.
  */
-export const pageQuery = groq`*[_type == "page" && slug.current == $slug && language == $lang][0]{
+export const pageQuery = defineQuery(`*[_type == "page" && slug.current == $slug && language == $lang][0]{
   ...
-}`;
+}`);

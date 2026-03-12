@@ -16,8 +16,13 @@ import { parseCookies, setResponseHeader } from "h3";
 export default defineEventHandler((event) => {
   const cookies = parseCookies(event);
 
-  // Always set Vary: Cookie so CDN caches different versions based on preview cookie
-  setResponseHeader(event, "Vary", "Cookie");
+  // Set Vary: Cookie only on page routes, not on API routes or static assets
+  const path = getRequestURL(event).pathname;
+  const isApiRoute = path.startsWith("/api/");
+  const isStaticAsset = /\.(js|css|woff2?|ico|png|svg)$/.test(path);
+  if (!isApiRoute && !isStaticAsset) {
+    setResponseHeader(event, "Vary", "Cookie");
+  }
 
   const isPreview = Boolean(cookies["sanity-preview-id"]);
 

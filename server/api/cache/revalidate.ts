@@ -26,8 +26,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401 });
   }
 
-  await purgeCache({ tags: [body?._id] });
-  const storage = useStorage("cache");
-  await storage.clear();
+  const tags = [body?._id, body?._type].filter(Boolean);
+  await purgeCache({ tags });
+  await useStorage("cache").clear();
   return new Response("Purged successfully!", { status: 202 });
 });

@@ -1,6 +1,7 @@
-import type { PageQueryResult } from "#build/types/sanity-typegen";
+import { type MaybeRef, toValue } from "vue";
+import type { PageQueryResult } from "#sanity-types";
 
-export const useSanityPage = (params: { lang: string; slug: string }) => {
+export const useSanityPage = (params: MaybeRef<{ lang: string; slug: string }>) => {
   const visualEditingState = useSanityVisualEditingState();
   const isPreview = computed(() => Boolean(visualEditingState?.enabled));
 
@@ -9,6 +10,6 @@ export const useSanityPage = (params: { lang: string; slug: string }) => {
   }
 
   return useFetch<PageQueryResult>("/api/sanity/page", {
-    query: params,
+    query: computed(() => toValue(params)),
   });
 };

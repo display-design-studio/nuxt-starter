@@ -7,6 +7,6 @@
  *
  * @returns `HomeQueryResult` — single home document or `null` if not found.
  */
-export const homeQuery = groq`*[_type == "home"][0]{
+export const homeQuery = defineQuery(`*[_type == "home"][0]{
   _id
-}`;
+}`);

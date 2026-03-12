@@ -1,8 +1,11 @@
 <script setup lang="ts">
 const { locale } = useI18n();
-const { data: home } = await useSanityHome({ lang: locale.value });
+const params = computed(() => ({ lang: locale.value }));
+const { data: home } = await useSanityHome(params);
 
-if (home.value?._id) {
+if (!home.value) throw createError({ statusCode: 404 });
+
+if (home.value._id) {
   useCacheTag(`${home.value._id}`);
 }
 </script>

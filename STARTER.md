@@ -123,7 +123,7 @@ Same shape for `useSanityPage` (adds `slug` param).
 
 | Layer | Duration | Mechanism |
 |---|---|---|
-| Browser | 60 s (`max-age=60`) | `Cache-Control` header |
+| Browser | 60 s (`max-age=3600`) | `Cache-Control` header |
 | Netlify CDN | 24 h (`s-maxage=86400`) | SWR via `routeRules` + header |
 
 ### `routeRules` (`nuxt.config.ts`)
@@ -132,7 +132,7 @@ Same shape for `useSanityPage` (adds `slug` param).
 routeRules: {
   "/**": {
     swr: 86400,
-    headers: { "cache-control": "public, max-age=60, s-maxage=86400, stale-while-revalidate=86400" },
+    headers: { "cache-control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400" },
   },
   "/api/**": { swr: false },  // API routes manage their own cache headers
 }

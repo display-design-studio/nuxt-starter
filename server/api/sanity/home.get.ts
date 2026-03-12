@@ -1,7 +1,7 @@
-import type { HomeQueryResult } from "#build/types/sanity-typegen";
+import type { HomeQueryResult } from "#sanity-types";
 import { getQuery, setHeader } from "h3";
 
-const browserMaxAge = 60;
+const browserMaxAge = 3600;
 const cdnMaxAge = 86400;
 
 /**
@@ -13,7 +13,7 @@ const cdnMaxAge = 86400;
  * - `lang` (optional, default `"en"`) — locale code passed to `homeQuery` as `$lang`.
  *
  * Cache behaviour:
- * - Browser: `max-age=60` (1 minute)
+ * - Browser: `max-age=3600` (1 hour)
  * - CDN / Nitro SWR: `s-maxage=86400, stale-while-revalidate=86400` (24 hours)
  * - Nitro cache key: `home:<lang>`
  *
