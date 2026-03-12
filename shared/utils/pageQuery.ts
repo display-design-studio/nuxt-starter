@@ -1,3 +1,5 @@
+import { defineQuery } from "groq";
+
 /**
  * GROQ query to fetch a single page document by slug and language.
  *
@@ -9,6 +11,7 @@
  *
  * @returns `PageQueryResult` — full page document or `null` if not found.
  */
-export const pageQuery = defineQuery(`*[_type == "page" && slug.current == $slug && language == $lang][0]{
+export const pageQuery =
+  defineQuery(`*[_type == "page" && slug.current == $slug && language == $lang][0]{
   ...
 }`);

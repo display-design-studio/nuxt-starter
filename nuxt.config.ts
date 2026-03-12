@@ -8,7 +8,7 @@ export default defineNuxtConfig({
 
   alias: {
     "#sanity-types": fileURLToPath(
-      new URL("./studio/types/sanity.types.ts", import.meta.url)
+      new URL("./studio/types/sanity.types.ts", import.meta.url),
     ),
   },
 
@@ -20,7 +20,7 @@ export default defineNuxtConfig({
     sanityWebhookSecret: process.env.NUXT_SANITY_WEBHOOK_SECRET,
   },
 
-  css: ["./app/assets/css/main.css"],
+  css: ["/assets/css/main.css"],
 
   vite: {
     plugins: [tailwindcss()],
@@ -42,6 +42,7 @@ export default defineNuxtConfig({
   },
 
   i18n: {
+    strategy: "prefix_except_default",
     defaultLocale: "en",
     locales: [
       { code: "en", name: "English", file: "en.json" },
@@ -64,6 +65,7 @@ export default defineNuxtConfig({
     //   ],
     // },
     visualEditing: {
+      token: process.env.NUXT_SANITY_TOKEN,
       studioUrl: process.env.NUXT_SANITY_VISUAL_EDITING_STUDIO_URL,
       stega: true,
     },
@@ -80,6 +82,6 @@ export default defineNuxtConfig({
         "cache-control": "public, max-age=0, must-revalidate",
       },
     },
-    "/api/**": { swr: false },
+    "/api/sanity/**": { isr: false },
   },
 });

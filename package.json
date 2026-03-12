@@ -18,13 +18,17 @@
     "@nuxtjs/i18n": "10.2.1",
     "@nuxtjs/sanity": "2.1.0",
     "@nuxtjs/seo": "3.4.0",
-    "@sanity/client": "^7.15.0",
-    "@tailwindcss/vite": "^4.1.18",
-    "@unhead/vue": "^2.1.4",
-    "eslint": "^9.39.2",
-    "nuxt": "^4.3.1",
-    "tailwindcss": "^4.1.18",
-    "vue": "^3.5.28",
+    "@sanity/client": "^7.17.0",
+    "@tailwindcss/vite": "^4.2.1",
+    "@unhead/vue": "^2.1.12",
+    "eslint": "^9.39.4",
+    "nuxt": "^4.4.2",
+    "tailwindcss": "^4.2.1",
+    "vue": "^3.5.30",
     "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "prettier": "^3.8.1",
+    "prettier-plugin-tailwindcss": "^0.7.2"
   }
 }

@@ -1,3 +1,5 @@
+import { defineQuery } from "groq";
+
 /**
  * GROQ query to fetch the home document.
  *

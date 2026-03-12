@@ -40,6 +40,7 @@ export default defineCachedEventHandler(
   },
   {
     maxAge: cdnMaxAge,
+    shouldBypassCache: () => import.meta.dev,
     getKey: (event) => {
       const query = getQuery(event);
       const locale = typeof query.lang === "string" ? query.lang : "en";

@@ -6,10 +6,10 @@ export const useSanityHome = (params: MaybeRef<{ lang: string }>) => {
   const isPreview = computed(() => Boolean(visualEditingState?.enabled));
 
   if (isPreview.value) {
-    return useSanityQuery<HomeQueryResult>(homeQuery, params);
+    return useSanityQuery<HomeQueryResult>(homeQuery, toValue(params));
   }
 
   return useFetch<HomeQueryResult>("/api/sanity/home", {
-    query: computed(() => toValue(params)),
+    query: () => toValue(params),
   });
 };
