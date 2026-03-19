@@ -8,10 +8,14 @@ export const useSanityPage = (
   const isPreview = computed(() => Boolean(visualEditingState?.enabled));
 
   if (isPreview.value) {
-    return useSanityQuery<PageQueryResult>(pageQuery, toValue(params));
+    const { data } = useSanityQuery<PageQueryResult>(
+      pageQuery,
+      toValue(params),
+    );
+    return { data };
   }
 
   return useFetch<PageQueryResult>("/api/sanity/page", {
-    query: () => toValue(params),
+    query: toValue(params),
   });
 };

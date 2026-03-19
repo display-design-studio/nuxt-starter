@@ -1,4 +1,5 @@
 import { purgeCache } from "@netlify/functions";
+import { isValidSignature } from "@sanity/webhook";
 
 /**
  * Sanity webhook handler for on-demand cache invalidation.
@@ -6,7 +7,7 @@ import { purgeCache } from "@netlify/functions";
  *
  * @remarks
  * Intended to be called by a Sanity webhook (GROQ-powered HTTP trigger).
- * Authentication: `X-Sanity-Webhook-Secret` header must match `NUXT_SANITY_WEBHOOK_SECRET`.
+ * Authentication: HMAC-SHA256 signature verified via `@sanity/webhook`.
  *
  * Expected body: `{ _id: string }` — the Sanity document ID that was updated.
  * Performs a granular Netlify CDN tag purge for that `_id`, then clears the
@@ -17,15 +18,17 @@ import { purgeCache } from "@netlify/functions";
  * @returns 202 response with plain-text body `"Purged successfully!"`
  */
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
-
+  const rawBody = (await readRawBody(event)) ?? "";
+  const signature = getHeader(event, "sanity-webhook-signature") ?? "";
   const config = useRuntimeConfig();
+
   if (
-    event.headers.get("X-Sanity-Webhook-Secret") !== config.sanityWebhookSecret
+    !(await isValidSignature(rawBody, signature, config.sanityWebhookSecret))
   ) {
     throw createError({ statusCode: 401 });
   }
 
+  const body = JSON.parse(rawBody);
   const tags = [body?._id, body?._type].filter(Boolean);
   await purgeCache({ tags });
   await useStorage("cache").clear();

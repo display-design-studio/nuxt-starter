@@ -16,7 +16,6 @@ export default defineNuxtConfig({
     sanity: {
       token: process.env.NUXT_SANITY_TOKEN,
     },
-    purgeSecret: process.env.NUXT_PURGE_SECRET,
     sanityWebhookSecret: process.env.NUXT_SANITY_WEBHOOK_SECRET,
   },
 
@@ -46,7 +45,7 @@ export default defineNuxtConfig({
     defaultLocale: "en",
     locales: [
       { code: "en", name: "English", file: "en.json" },
-      { code: "it", name: "Italian", file: "it.json" },
+      // { code: "it", name: "Italian", file: "it.json" },
     ],
   },
 
@@ -56,14 +55,6 @@ export default defineNuxtConfig({
     apiVersion: "2026-03-10",
     perspective: "published",
     useCdn: true,
-    // typegen: {
-    //   enabled: true,
-    //   schemaTypesPath: "./studio/schemaTypes/index.ts",
-    //   queryPaths: [
-    //     "server/sanity/queries/**/*.{ts,js,mjs}",
-    //     "app/**/*.{vue,ts,js,mjs}",
-    //   ],
-    // },
     visualEditing: {
       token: process.env.NUXT_SANITY_TOKEN,
       studioUrl: process.env.NUXT_SANITY_VISUAL_EDITING_STUDIO_URL,
@@ -73,13 +64,15 @@ export default defineNuxtConfig({
 
   sitemap: {
     sources: ["/api/__sitemap__/urls"],
+    cacheMaxAgeSeconds: 604800,
   },
 
   routeRules: {
     "/**": {
       isr: 86400,
       headers: {
-        "cache-control": "public, max-age=0, must-revalidate",
+        "cache-control":
+          "public, max-age=0, s-maxage=31536000, stale-while-revalidate=31536000",
       },
     },
     "/api/sanity/**": { isr: false },
