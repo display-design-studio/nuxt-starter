@@ -123,10 +123,24 @@ Same shape for `useSanityPage` (adds `slug` param).
 
 | Layer | Duration | Mechanism |
 |---|---|---|
-| Browser | 60 s (`max-age=3600`) | `Cache-Control` header |
-| Netlify CDN | 24 h (`s-maxage=86400`) | SWR via `routeRules` + header |
+| Browser | 1 h (`max-age=3600`) | `Cache-Control` header |
+| Netlify CDN | 24 h (`s-maxage=86400`) | ISR or SWR via `routeRules` + header |
 
 ### `routeRules` (`nuxt.config.ts`)
+
+**ISR (recommended)** — static until explicit webhook purge:
+
+```ts
+routeRules: {
+  "/**": {
+    isr: true,
+    headers: { "cache-control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400" },
+  },
+  "/api/**": { isr: false },  // API routes manage their own cache headers
+}
+```
+
+**SWR alternative** — serve stale, regenerate in background:
 
 ```ts
 routeRules: {
@@ -134,9 +148,11 @@ routeRules: {
     swr: 86400,
     headers: { "cache-control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400" },
   },
-  "/api/**": { swr: false },  // API routes manage their own cache headers
+  "/api/**": { swr: false },
 }
 ```
+
+Choose **ISR** for webhook-driven invalidation (recommended). Use **SWR** only when webhook-based purge is unavailable.
 
 ### Preview bypass (`server/middleware/sanity-preview-cache.ts`)
 
@@ -193,8 +209,8 @@ export const <type>Query = groq`*[_type == "<type>" && language == $lang][0]{
 import type { <Type>QueryResult } from "#build/types/sanity-typegen";
 import { getQuery, setHeader } from "h3";
 
-const browserMaxAge = 60;
-const cdnMaxAge = 86400;
+const browserMaxAge = 3600;    // browser fresh 1 hour
+const cdnMaxAge = 86400;        // CDN + SWR 24 hours
 
 export default defineCachedEventHandler(
   async (event) => {
