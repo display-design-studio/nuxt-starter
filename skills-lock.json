@@ -1,6 +1,11 @@
 {
   "version": 1,
   "skills": {
+    "caveman": {
+      "source": "display-design-studio/skills",
+      "sourceType": "github",
+      "computedHash": "a818cdc41dcfaa50dd891c5cb5e5705968338de02e7e37949ca56e8c30ad4176"
+    },
     "gsap": {
       "source": "display-design-studio/skills",
       "sourceType": "github",
@@ -35,6 +40,11 @@
       "source": "display-design-studio/skills",
       "sourceType": "github",
       "computedHash": "9c241141e07e836e4f0537c63e8f929fba3767c2997250be38e699f19b75e3f2"
+    },
+    "web-design-guidelines": {
+      "source": "display-design-studio/skills",
+      "sourceType": "github",
+      "computedHash": "a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a"
     }
   }
 }
