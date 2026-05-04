@@ -1,15 +1,15 @@
-import type { HomeQueryResult } from "#sanity-types";
-import { type MaybeRef, toValue } from "vue";
+import type { HomeQueryResult } from '#sanity-types'
+import { type MaybeRef, toValue } from 'vue'
 
 export const useSanityHome = (params: MaybeRef<{ lang: string }>) => {
-  const visualEditingState = useSanityVisualEditingState();
-  const isPreview = computed(() => Boolean(visualEditingState?.enabled));
+  const visualEditingState = useSanityVisualEditingState()
+  const isPreview = computed(() => Boolean(visualEditingState?.enabled))
 
   if (isPreview.value) {
-    return useSanityQuery<HomeQueryResult>(homeQuery, toValue(params));
+    return useSanityQuery<HomeQueryResult>(homeQuery, toValue(params))
   }
 
-  return useFetch<HomeQueryResult>("/api/sanity/home", {
+  return useFetch<HomeQueryResult>('/api/sanity/home', {
     query: () => toValue(params),
-  });
-};
+  })
+}
