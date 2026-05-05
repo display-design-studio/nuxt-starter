@@ -1,8 +1,12 @@
-.PHONY: help up down build install install-bun install-rails logs-bun logs-rails shell
+.PHONY: help up down build install install-bun install-rails logs-bun logs-rails shell prod-build prod-run prod-clean
 
 COMPOSE = podman compose
 BUN = bun
 RAILS = rails
+
+IMAGE_NAME = template-nuxt-prod
+CONTAINER_NAME = template-nuxt-prod
+PORT = 3000
 
 help:
 	@echo ""
@@ -24,6 +28,11 @@ help:
 	@echo "    make install           → Install Bun and Rails dependencies"
 	@echo "    make install-bun       → Install JS deps with bun install --ignore-scripts"
 	@echo "    make install-rails     → Install Ruby gems with bundle install"
+	@echo ""
+	@echo "  Production:"
+	@echo "    make prod-build        → Build production image"
+	@echo "    make prod-run          → Run production container"
+	@echo "    make prod-clean        → Remove production container/image"
 	@echo ""
 
 up:
@@ -51,3 +60,16 @@ logs-rails:
 
 shell:
 	$(COMPOSE) exec $(BUN) sh
+
+prod-build:
+	podman build -t $(IMAGE_NAME) .
+
+prod-run:
+	podman run --rm \
+		--name $(CONTAINER_NAME) \
+		-p 127.0.0.1:$(PORT):3000 \
+		$(IMAGE_NAME)
+
+prod-clean:
+	-podman rm -f $(CONTAINER_NAME)
+	-podman rmi $(IMAGE_NAME)
