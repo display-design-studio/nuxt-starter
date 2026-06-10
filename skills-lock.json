@@ -4,6 +4,7 @@
     "caveman": {
       "source": "display-design-studio/skills",
       "sourceType": "github",
+      "skillPath": "skills/caveman/SKILL.md",
       "computedHash": "a818cdc41dcfaa50dd891c5cb5e5705968338de02e7e37949ca56e8c30ad4176"
     },
     "gsap": {
@@ -14,36 +15,43 @@
     "nuxt": {
       "source": "display-design-studio/skills",
       "sourceType": "github",
+      "skillPath": "skills/nuxt/SKILL.md",
       "computedHash": "9e8237ec92083db9a6f4c77d5e5bf4b1d9873d670671235bc75455ee1ca39c74"
     },
     "nuxt-sanity": {
       "source": "display-design-studio/skills",
       "sourceType": "github",
+      "skillPath": "skills/nuxt-sanity/SKILL.md",
       "computedHash": "f7a6643810c97616402e70dbf78c41b5eb0af4c53386557f288eab639da72378"
     },
     "nuxt-seo": {
       "source": "display-design-studio/skills",
       "sourceType": "github",
+      "skillPath": "skills/nuxt-seo/SKILL.md",
       "computedHash": "daa91384a5d3738ed0d53cbfc650c5d117ce43d177d7c2d98c4b9274277a50f5"
     },
     "tailwind": {
       "source": "display-design-studio/skills",
       "sourceType": "github",
+      "skillPath": "skills/tailwind/SKILL.md",
       "computedHash": "6def58579cdde2f095b5fac36aab2ab32524a006f572b0db582e70964548650d"
     },
     "vite": {
       "source": "display-design-studio/skills",
       "sourceType": "github",
+      "skillPath": "skills/vite/SKILL.md",
       "computedHash": "867ff66238f3152e9c494339ad08dc432dd0df5bcf5cc7a00b61a72b580eb908"
     },
     "vue": {
       "source": "display-design-studio/skills",
       "sourceType": "github",
+      "skillPath": "skills/vue/SKILL.md",
       "computedHash": "9c241141e07e836e4f0537c63e8f929fba3767c2997250be38e699f19b75e3f2"
     },
     "web-design-guidelines": {
       "source": "display-design-studio/skills",
       "sourceType": "github",
+      "skillPath": "skills/web-design-guidelines/SKILL.md",
       "computedHash": "a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a"
     }
   }
