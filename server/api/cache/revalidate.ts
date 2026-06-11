@@ -22,6 +22,13 @@ export default defineEventHandler(async (event) => {
   const signature = getHeader(event, "sanity-webhook-signature") ?? "";
   const config = useRuntimeConfig();
 
+  if (!config.sanityWebhookSecret) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Sanity webhook secret is not configured",
+    });
+  }
+
   if (
     !(await isValidSignature(rawBody, signature, config.sanityWebhookSecret))
   ) {

@@ -25,7 +25,7 @@ export default defineNuxtConfig({
     sanity: {
       token: process.env.NUXT_SANITY_TOKEN,
     },
-    sanityWebhookSecret: process.env.NUXT_SANITY_WEBHOOK_SECRET,
+    sanityWebhookSecret: "",
   },
 
   alias: {
@@ -43,6 +43,12 @@ export default defineNuxtConfig({
       },
     },
     "/api/sanity/**": { isr: false },
+    "/api/cache/**": {
+      isr: false,
+      headers: {
+        "cache-control": "no-store",
+      },
+    },
   },
   compatibilityDate: "2025-07-15",
 
