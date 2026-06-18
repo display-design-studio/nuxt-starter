@@ -1,4 +1,4 @@
-import { defineQuery } from "groq";
+import { defineQuery } from 'groq'
 
 /**
  * GROQ query to fetch the home document.
@@ -11,4 +11,4 @@ import { defineQuery } from "groq";
  */
 export const homeQuery = defineQuery(`*[_type == "home"][0]{
   _id
-}`);
+}`)

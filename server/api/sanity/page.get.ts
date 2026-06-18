@@ -1,8 +1,8 @@
-import type { PageQueryResult } from "#sanity-types";
-import { getQuery, setHeader } from "h3";
+import type { PageQueryResult } from '#sanity-types'
+import { getQuery, setHeader } from 'h3'
 
-const browserMaxAge = 3600;
-const cdnMaxAge = 86400;
+const browserMaxAge = 3600
+const cdnMaxAge = 86400
 
 /**
  * Cached endpoint to fetch a Sanity page document by slug and language.
@@ -23,33 +23,33 @@ const cdnMaxAge = 86400;
  */
 export default defineCachedEventHandler(
   async (event) => {
-    const { lang: locale = "en", slug = "" } = getQuery<{
-      lang?: string;
-      slug?: string;
-    }>(event);
+    const { lang: locale = 'en', slug = '' } = getQuery<{
+      lang?: string
+      slug?: string
+    }>(event)
 
     setHeader(
       event,
-      "Cache-Control",
+      'Cache-Control',
       `public, max-age=${browserMaxAge}, s-maxage=${cdnMaxAge}, stale-while-revalidate=${cdnMaxAge}`,
-    );
+    )
 
-    const sanity = useSanity();
+    const sanity = useSanity()
     return sanity.fetch<PageQueryResult>(
       pageQuery,
       { lang: locale, slug },
       { stega: false },
-    );
+    )
   },
   {
     maxAge: cdnMaxAge,
     shouldBypassCache: () => import.meta.dev,
     getKey: (event) => {
-      const { lang = "en", slug = "" } = getQuery<{
-        lang?: string;
-        slug?: string;
-      }>(event);
-      return `page:${lang}:${slug}`;
+      const { lang = 'en', slug = '' } = getQuery<{
+        lang?: string
+        slug?: string
+      }>(event)
+      return `page:${lang}:${slug}`
     },
   },
-);
+)

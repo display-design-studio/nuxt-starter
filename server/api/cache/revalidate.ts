@@ -1,5 +1,5 @@
-import { purgeCache } from "@netlify/functions";
-import { isValidSignature } from "@sanity/webhook";
+import { purgeCache } from '@netlify/functions'
+import { isValidSignature } from '@sanity/webhook'
 
 /**
  * Sanity webhook handler for on-demand cache invalidation.
@@ -18,26 +18,26 @@ import { isValidSignature } from "@sanity/webhook";
  * @returns 202 response with plain-text body `"Purged successfully!"`
  */
 export default defineEventHandler(async (event) => {
-  const rawBody = (await readRawBody(event)) ?? "";
-  const signature = getHeader(event, "sanity-webhook-signature") ?? "";
-  const config = useRuntimeConfig();
+  const rawBody = (await readRawBody(event)) ?? ''
+  const signature = getHeader(event, 'sanity-webhook-signature') ?? ''
+  const config = useRuntimeConfig()
 
   if (!config.sanityWebhookSecret) {
     throw createError({
       statusCode: 500,
-      statusMessage: "Sanity webhook secret is not configured",
-    });
+      statusMessage: 'Sanity webhook secret is not configured',
+    })
   }
 
   if (
     !(await isValidSignature(rawBody, signature, config.sanityWebhookSecret))
   ) {
-    throw createError({ statusCode: 401 });
+    throw createError({ statusCode: 401 })
   }
 
-  const body = JSON.parse(rawBody);
-  const tags = [body?._id, body?._type].filter(Boolean);
-  await purgeCache({ tags });
-  await useStorage("cache").clear();
-  return new Response("Purged successfully!", { status: 202 });
-});
+  const body = JSON.parse(rawBody)
+  const tags = [body?._id, body?._type].filter(Boolean)
+  await purgeCache({ tags })
+  await useStorage('cache').clear()
+  return new Response('Purged successfully!', { status: 202 })
+})

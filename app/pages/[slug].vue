@@ -1,16 +1,16 @@
 <script setup lang="ts">
-const route = useRoute();
-const { locale } = useI18n();
+const route = useRoute()
+const { locale } = useI18n()
 
 const params = computed(() => ({
   lang: locale.value,
   slug: route.params.slug as string,
-}));
+}))
 
-const { data: page } = await useSanityPage(params);
+const { data: page } = await useSanityPage(params)
 
 if (page?.value?._id) {
-  useCacheTag(`${page?.value?._id}`);
+  useCacheTag(`${page?.value?._id}`)
 }
 
 // if (!page.value) {

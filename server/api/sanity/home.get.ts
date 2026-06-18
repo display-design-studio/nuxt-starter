@@ -1,8 +1,8 @@
-import type { HomeQueryResult } from "#sanity-types";
-import { getQuery, setHeader } from "h3";
+import type { HomeQueryResult } from '#sanity-types'
+import { getQuery, setHeader } from 'h3'
 
-const browserMaxAge = 3600;
-const cdnMaxAge = 86400;
+const browserMaxAge = 3600
+const cdnMaxAge = 86400
 
 /**
  * Cached endpoint to fetch the Sanity home document.
@@ -22,29 +22,29 @@ const cdnMaxAge = 86400;
  */
 export default defineCachedEventHandler(
   async (event) => {
-    const query = getQuery(event);
-    const locale = typeof query.lang === "string" ? query.lang : "en";
+    const query = getQuery(event)
+    const locale = typeof query.lang === 'string' ? query.lang : 'en'
 
     setHeader(
       event,
-      "Cache-Control",
+      'Cache-Control',
       `public, max-age=${browserMaxAge}, s-maxage=${cdnMaxAge}, stale-while-revalidate=${cdnMaxAge}`,
-    );
+    )
 
-    const sanity = useSanity();
+    const sanity = useSanity()
     return sanity.fetch<HomeQueryResult>(
       homeQuery,
       { lang: locale },
       { stega: false },
-    );
+    )
   },
   {
     maxAge: cdnMaxAge,
     shouldBypassCache: () => import.meta.dev,
     getKey: (event) => {
-      const query = getQuery(event);
-      const locale = typeof query.lang === "string" ? query.lang : "en";
-      return `home:${locale}`;
+      const query = getQuery(event)
+      const locale = typeof query.lang === 'string' ? query.lang : 'en'
+      return `home:${locale}`
     },
   },
-);
+)
