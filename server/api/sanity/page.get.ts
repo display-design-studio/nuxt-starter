@@ -1,5 +1,6 @@
 import type { PageQueryResult } from '#sanity-types'
-import { getQuery, setHeader } from 'h3'
+import type { SanityQueryParams } from '~/shared/utils/queryParams'
+import { createError, getQuery, setHeader } from 'h3'
 
 const browserMaxAge = 3600
 const cdnMaxAge = 86400
@@ -23,10 +24,7 @@ const cdnMaxAge = 86400
  */
 export default defineCachedEventHandler(
   async (event) => {
-    const { lang: locale = 'en', slug = '' } = getQuery<{
-      lang?: string
-      slug?: string
-    }>(event)
+    const { lang: locale = 'en', slug = '' } = getQuery<SanityQueryParams>(event)
 
     setHeader(
       event,
@@ -35,20 +33,20 @@ export default defineCachedEventHandler(
     )
 
     const sanity = useSanity()
-    return sanity.fetch<PageQueryResult>(
+    const result = await sanity.fetch<PageQueryResult>(
       pageQuery,
       { lang: locale, slug },
       { stega: false },
     )
+
+    if (!result) throw createError({ statusCode: 404, statusMessage: 'Not Found' })
+    return result
   },
   {
     maxAge: cdnMaxAge,
     shouldBypassCache: () => import.meta.dev,
     getKey: (event) => {
-      const { lang = 'en', slug = '' } = getQuery<{
-        lang?: string
-        slug?: string
-      }>(event)
+      const { lang = 'en', slug = '' } = getQuery<SanityQueryParams>(event)
       return `page:${lang}:${slug}`
     },
   },

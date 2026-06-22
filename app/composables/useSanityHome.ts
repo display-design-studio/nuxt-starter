@@ -1,7 +1,7 @@
 import type { HomeQueryResult } from '#sanity-types'
 import { type MaybeRef, toValue } from 'vue'
 
-export const useSanityHome = (params: MaybeRef<{ lang: string }>) => {
+export const useSanityHome = (params: MaybeRef<Pick<SanityQueryParams, 'lang'>>) => {
   const visualEditingState = useSanityVisualEditingState()
   const isPreview = computed(() => Boolean(visualEditingState?.enabled))
 

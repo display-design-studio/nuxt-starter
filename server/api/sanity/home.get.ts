@@ -1,5 +1,6 @@
 import type { HomeQueryResult } from '#sanity-types'
-import { getQuery, setHeader } from 'h3'
+import type { SanityQueryParams } from '~/shared/utils/queryParams'
+import { createError, getQuery, setHeader } from 'h3'
 
 const browserMaxAge = 3600
 const cdnMaxAge = 86400
@@ -22,8 +23,7 @@ const cdnMaxAge = 86400
  */
 export default defineCachedEventHandler(
   async (event) => {
-    const query = getQuery(event)
-    const locale = typeof query.lang === 'string' ? query.lang : 'en'
+    const { lang: locale = 'en' } = getQuery<Pick<SanityQueryParams, 'lang'>>(event)
 
     setHeader(
       event,
@@ -32,18 +32,20 @@ export default defineCachedEventHandler(
     )
 
     const sanity = useSanity()
-    return sanity.fetch<HomeQueryResult>(
+    const result = await sanity.fetch<HomeQueryResult>(
       homeQuery,
       { lang: locale },
       { stega: false },
     )
+
+    if (!result) throw createError({ statusCode: 404, statusMessage: 'Not Found' })
+    return result
   },
   {
     maxAge: cdnMaxAge,
     shouldBypassCache: () => import.meta.dev,
     getKey: (event) => {
-      const query = getQuery(event)
-      const locale = typeof query.lang === 'string' ? query.lang : 'en'
+      const { lang: locale = 'en' } = getQuery<Pick<SanityQueryParams, 'lang'>>(event)
       return `home:${locale}`
     },
   },

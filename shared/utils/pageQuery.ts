@@ -12,6 +12,6 @@ import { defineQuery } from 'groq'
  * @returns `PageQueryResult` — full page document or `null` if not found.
  */
 export const pageQuery
-  = defineQuery(`*[_type == "page" && slug.current == $slug && language == $lang][0]{
+  = defineQuery(`*[_type == "page" && slug[$lang].current == $slug && language == $lang][0]{
   ...
 }`)
