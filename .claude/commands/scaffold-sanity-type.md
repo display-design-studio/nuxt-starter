@@ -2,6 +2,13 @@ Scaffold the full 4-file pattern for a new Sanity document type.
 
 **Always respond in English. Be token-efficient: no explanations, no options — just create the files.**
 
+## Step 0: Check the schema
+
+Before generating files, try to read `studio/schemaTypes/documents/<camelCase>.ts`:
+
+- **If found**: extract all field names and types. Use them in the generated query projection instead of `// add your fields here`. Note the slug type (`localeSlug` → use `slug[$lang].current`; plain `slug` → use `slug.current`).
+- **If not found**: proceed with `// add your fields here` placeholder and note in the output that the schema wasn't found.
+
 ## Input format
 
 The user passes a PascalCase type name, optionally followed by `singleton`:
