@@ -38,7 +38,8 @@ export default defineCachedEventHandler(
       { stega: false },
     )
 
-    if (!result) throw createError({ statusCode: 404, statusMessage: 'Not Found' })
+    if (!result)
+      throw createError({ statusCode: 404, statusMessage: 'Not Found' })
     return result
   },
   {

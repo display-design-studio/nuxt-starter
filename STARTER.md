@@ -89,15 +89,15 @@ sanity: {
 
 ```ts
 // app/composables/useSanityHome.ts
-export const useSanityHome = (params: { lang: string }) => {
-  const visualEditingState = useSanityVisualEditingState();
-  const isPreview = computed(() => Boolean(visualEditingState?.enabled));
+export function useSanityHome(params: { lang: string }) {
+  const visualEditingState = useSanityVisualEditingState()
+  const isPreview = computed(() => Boolean(visualEditingState?.enabled))
 
   if (isPreview.value) {
-    return useSanityQuery<HomeQueryResult>(homeQuery, params);
+    return useSanityQuery<HomeQueryResult>(homeQuery, params)
   }
-  return useFetch<HomeQueryResult>("/api/sanity/home", { query: params });
-};
+  return useFetch<HomeQueryResult>('/api/sanity/home', { query: params })
+}
 ```
 
 Same shape for `useSanityPage` (adds `slug` param).
@@ -168,7 +168,7 @@ Tag value = Sanity document `_id`. Enables granular CDN purge per document.
 
 ```ts
 // In a page component (server-side only)
-useCacheTag(home.value._id);
+useCacheTag(home.value._id)
 ```
 
 ### Cache invalidation
@@ -252,11 +252,11 @@ export const useSanity<Type> = (params: { lang: string }) => {
 
 ```vue
 <script setup lang="ts">
-const { locale } = useI18n();
-const { data } = await useSanity<Type>({ lang: locale.value });
+const { locale } = useI18n()
+const { data } = await useSanity<Type>({ lang: locale.value })
 
 if (data.value?._id) {
-  useCacheTag(data.value._id);
+  useCacheTag(data.value._id)
 }
 </script>
 ```
@@ -271,10 +271,11 @@ The data-fetching and caching wiring is already correct; only the template needs
 
 ```vue
 <script setup lang="ts">
-const route = useRoute();
-const { locale } = useI18n();
-const { data: page } = await useSanityPage({ lang: locale.value, slug: route.params.slug as string });
-if (page.value?._id) useCacheTag(page.value._id);
+const route = useRoute()
+const { locale } = useI18n()
+const { data: page } = await useSanityPage({ lang: locale.value, slug: route.params.slug as string })
+if (page.value?._id)
+  useCacheTag(page.value._id)
 </script>
 ```
 

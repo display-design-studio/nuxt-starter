@@ -9,9 +9,11 @@ export const groqSyntax = {
   create(context) {
     return {
       CallExpression(node) {
-        if (node.callee.type !== 'Identifier' || node.callee.name !== 'defineQuery') return
+        if (node.callee.type !== 'Identifier' || node.callee.name !== 'defineQuery')
+          return
         const arg = node.arguments[0]
-        if (!arg) return
+        if (!arg)
+          return
 
         let query = null
         if (arg.type === 'Literal' && typeof arg.value === 'string') {
@@ -21,7 +23,8 @@ export const groqSyntax = {
           query = arg.quasis[0].value.cooked
         }
 
-        if (query === null) return
+        if (query === null)
+          return
 
         try {
           parse(query)

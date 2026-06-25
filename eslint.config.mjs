@@ -1,12 +1,24 @@
-// @ts-check
-import withNuxt from './.nuxt/eslint.config.mjs'
-import tailwindcss from 'eslint-plugin-tailwindcss'
+import antfu from '@antfu/eslint-config'
 import sanity from '@sanity-labs/eslint-plugin'
+import tailwindcss from 'eslint-plugin-tailwindcss'
 import { groqSyntax } from './eslint-rules/groq-syntax.mjs'
 
-export default withNuxt(
-  { ignores: ['.nuxt/', '.output/', 'dist/'] },
-  tailwindcss.configs['recommended'],
+export default antfu(
+  {
+    // Configures for antfu's config
+  },
+  {
+    ignores: [
+      '.nuxt/',
+      '.output/',
+      'dist/',
+      'studio/',
+      'studio/**',
+    ],
+  },
+
+  // tailwindcss
+  tailwindcss.configs.recommended,
   {
     files: ['**/*.vue', '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
     settings: {
@@ -15,6 +27,8 @@ export default withNuxt(
       },
     },
   },
+
+  // Sanity
   ...sanity.configs.groq,
   {
     settings: {

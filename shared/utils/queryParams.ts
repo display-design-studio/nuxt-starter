@@ -1,1 +1,1 @@
-export type SanityQueryParams = { lang: string, slug?: string }
+export interface SanityQueryParams { lang: string, slug?: string }

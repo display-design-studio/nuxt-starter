@@ -26,7 +26,8 @@ export default defineEventHandler((event) => {
 
   const isPreview = Boolean(cookies['sanity-preview-id'])
 
-  if (!isPreview) return
+  if (!isPreview)
+    return
   setResponseHeader(event, 'cache-control', 'no-store')
   if (!event.context._nitro) {
     event.context._nitro = {}

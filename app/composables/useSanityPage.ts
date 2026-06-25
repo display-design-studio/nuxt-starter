@@ -1,9 +1,8 @@
+import type { MaybeRef } from 'vue'
 import type { PageQueryResult } from '#sanity-types'
-import { type MaybeRef, toValue } from 'vue'
+import { toValue } from 'vue'
 
-export const useSanityPage = (
-  params: MaybeRef<Required<SanityQueryParams>>,
-) => {
+export function useSanityPage(params: MaybeRef<Required<SanityQueryParams>>) {
   const visualEditingState = useSanityVisualEditingState()
   const isPreview = computed(() => Boolean(visualEditingState?.enabled))
 
