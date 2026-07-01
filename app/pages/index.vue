@@ -10,7 +10,7 @@ if (home?.value?._id) {
 
 <template>
   <div>
-    <h1 class="mt-2 bg-red-500 text-blue-200 pb-[500px] mb-2">
+    <h1>
       Data:
     </h1>
     <pre>{{ home }} </pre>

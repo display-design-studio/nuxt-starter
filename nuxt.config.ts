@@ -1,5 +1,5 @@
-import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
+import { fileURLToPath } from 'node:url'
 
 export default defineNuxtConfig({
   modules: [
@@ -97,6 +97,10 @@ export default defineNuxtConfig({
   },
 
   ogImage: {
+    enabled: false,
+  },
+
+  schemaOrg: {
     enabled: false,
   },
 
