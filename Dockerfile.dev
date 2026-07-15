@@ -1,37 +1,46 @@
+# Use the official Bun image as the base development environment.
 FROM oven/bun:1.3
 
+# Set the application directory as the default working directory.
 WORKDIR /app
 
+# Switch to root temporarily to install system-level dependencies.
 USER root
 
+# Install the minimal system dependencies required for development:
+# - ca-certificates: enables secure HTTPS connections
+# - curl: downloads external resources, including the Node.js binary
+# - git: required for Git operations and Git-based dependencies
+# - fd-find: fast file finder used by development tools
+# - ripgrep: fast text search used by editors and OpenCode
+# - tar/xz-utils: required to extract the Node.js distribution archive. etc
 RUN apt-get update -y && apt-get install -y --no-install-recommends \
   bash \
   build-essential \
   ca-certificates \
   curl \
   git \
-  gzip \
-  fd-find \
-  libpq-dev \
-  libvips \
-  libyaml-dev \
-  make \
   pkg-config \
   python3 \
-  python3-pip \
   ripgrep \
   tar \
-  tzdata \
   unzip \
-  wget \
   xz-utils \
   && rm -rf /var/lib/apt/lists/*
-  
+
+# Debian installs `fd` under the `fdfind` command name.
+# Create the standard `fd` command expected by development tools.
 RUN ln -sf /usr/bin/fdfind /usr/local/bin/fd
+
+# Configure Bun's global package installation directories and make
+# globally installed Bun executables available in PATH.
 ENV BUN_INSTALL_GLOBAL_DIR=/home/bun/.bun/install/global \
     BUN_INSTALL_BIN=/home/bun/.bun/bin \
     PATH="/home/bun/.bun/bin:$PATH"
 
+# Create the directories commonly used by Bun and development tools.
+# Assign ownership to the non-root `bun` user so tools can write to
+# these locations without requiring elevated permissions.
 RUN mkdir -p \
   /app \
   /home/bun/.bun \
@@ -39,8 +48,35 @@ RUN mkdir -p \
   /home/bun/.local/share \
   /home/bun/.cache \
   && chown -R bun:bun /app /home/bun
-  
-USER bun
-# bun -g tools here (opencode, etc)
 
-EXPOSE 3000
+# Install a specific Node.js version alongside Bun for compatibility
+# with tools and packages that explicitly depend on Node.js, npm, or npx.
+#
+# The correct official binary is selected automatically for AMD64
+# and ARM64 environments.
+ARG NODE_VERSION=22.22.2
+RUN set -eux; \
+  arch="$(dpkg --print-architecture)"; \
+  case "$arch" in \
+    amd64) node_arch="x64" ;; \
+    arm64) node_arch="arm64" ;; \
+    *) echo "Unsupported architecture: $arch"; exit 1 ;; \
+  esac; \
+  curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${node_arch}.tar.xz"; \
+  tar -xJf "node-v${NODE_VERSION}-linux-${node_arch}.tar.xz" \
+    -C /usr/local \
+    --strip-components=1 \
+    --no-same-owner; \
+  rm "node-v${NODE_VERSION}-linux-${node_arch}.tar.xz"; \
+  node --version; \
+  npm --version; \
+  npx --version
+
+# Run the development environment as the non-root `bun` user.
+USER bun
+
+# Install global development tools managed by Bun.
+RUN bun install -g opencode-ai
+
+# Expose the Nuxt development server and OpenCode server ports.
+EXPOSE 3000 4096
