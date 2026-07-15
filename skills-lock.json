@@ -16,13 +16,13 @@
       "source": "display-design-studio/skills",
       "sourceType": "github",
       "skillPath": "skills/nuxt/SKILL.md",
-      "computedHash": "9e8237ec92083db9a6f4c77d5e5bf4b1d9873d670671235bc75455ee1ca39c74"
+      "computedHash": "96dbdbfc06bf7045aeb9a463b972d5c0b5679d6dadf196d8ef6b98dc6defed2d"
     },
     "nuxt-sanity": {
       "source": "display-design-studio/skills",
       "sourceType": "github",
       "skillPath": "skills/nuxt-sanity/SKILL.md",
-      "computedHash": "f7a6643810c97616402e70dbf78c41b5eb0af4c53386557f288eab639da72378"
+      "computedHash": "eb8ea2f72d35fe7663159c3e3882d5bbdd0da7a18e2a61b7ea3a73ca53dbe9d6"
     },
     "nuxt-seo": {
       "source": "display-design-studio/skills",
