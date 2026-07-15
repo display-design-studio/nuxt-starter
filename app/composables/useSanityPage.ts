@@ -15,6 +15,6 @@ export function useSanityPage(params: MaybeRef<Required<SanityQueryParams>>) {
   }
 
   return useFetch<PageQueryResult>('/api/sanity/page', {
-    query: toValue(params),
+    query: () => toValue(params),
   })
 }

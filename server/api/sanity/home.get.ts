@@ -18,8 +18,7 @@ const cdnMaxAge = 86400
  * - CDN / Nitro SWR: `s-maxage=86400, stale-while-revalidate=86400` (24 hours)
  * - Nitro cache key: `home:<lang>`
  *
- * Cache is invalidated via the Sanity webhook (`/api/cache/revalidate`)
- * or manually via `POST /api/cache/purge`.
+ * Cache is invalidated via the Sanity webhook (`/api/cache/revalidate`).
  */
 export default defineCachedEventHandler(
   async (event) => {
@@ -32,11 +31,17 @@ export default defineCachedEventHandler(
     )
 
     const sanity = useSanity()
-    const result = await sanity.fetch<HomeQueryResult>(
-      homeQuery,
-      { lang: locale },
-      { stega: false },
-    )
+    let result: HomeQueryResult
+    try {
+      result = await sanity.fetch<HomeQueryResult>(
+        homeQuery,
+        { lang: locale },
+        { stega: false },
+      )
+    }
+    catch {
+      throw createError({ statusCode: 502, statusMessage: 'Failed to fetch from Sanity' })
+    }
 
     if (!result)
       throw createError({ statusCode: 404, statusMessage: 'Not Found' })

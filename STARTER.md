@@ -36,7 +36,7 @@ app/
 server/
   api/
     sanity/           # Cached Nitro endpoints: home.get.ts, page.get.ts
-    cache/            # revalidate.ts (webhook), purge.post.ts (manual)
+    cache/            # revalidate.ts (Sanity webhook)
   middleware/
     sanity-preview-cache.ts   # Vary: Cookie + no-store for preview
 
@@ -67,7 +67,7 @@ Enable typegen by uncommenting the `typegen` block in `nuxt.config.ts` and point
 
 ```ts
 sanity: {
-  projectId: process.env.SANITY_PROJECT_ID,
+  projectId: process.env.NUXT_SANITY_PROJECT_ID,
   dataset: "production",
   apiVersion: "2026-03-10",
   perspective: "published",
@@ -175,17 +175,17 @@ useCacheTag(home.value._id)
 
 | Endpoint | Trigger | Auth | Behaviour |
 |---|---|---|---|
-| `POST /api/cache/revalidate` | Sanity webhook | `X-Sanity-Webhook-Secret` header | Purges CDN by `_id` tag + clears Nitro storage |
-| `POST /api/cache/purge` | Manual / deploy script | `x-purge-secret` header | Purges by `_id` tag (if provided) or entire CDN + clears Nitro storage |
+| `POST /api/cache/revalidate` | Sanity webhook | `X-Sanity-Webhook-Secret` header | Purges CDN by `_id` tag (+ `_type`) |
+
+Targeted invalidation is fully covered by the Sanity webhook above — there is no manual/deploy-triggered purge endpoint.
 
 ### Required env vars
 
 | Variable | Purpose |
 |---|---|
-| `SANITY_PROJECT_ID` | Sanity project ID |
+| `NUXT_SANITY_PROJECT_ID` | Sanity project ID |
 | `NUXT_SANITY_TOKEN` | Sanity API token (read + visual editing) |
 | `NUXT_SANITY_VISUAL_EDITING_STUDIO_URL` | Sanity Studio URL for visual editing overlay |
-| `NUXT_PURGE_SECRET` | Secret for `POST /api/cache/purge` |
 | `NUXT_SANITY_WEBHOOK_SECRET` | Secret for `POST /api/cache/revalidate` (Sanity webhook) |
 
 ---
@@ -293,7 +293,7 @@ if (page.value?._id)
 
 ## 7. Deployment
 
-This starter is **Netlify-first**. Cache invalidation relies on `purgeCache` from `@netlify/functions`, which is a Netlify-specific API. Both `/api/cache/revalidate` and `/api/cache/purge` call it directly. If deploying to a different platform, these endpoints need to be replaced with the equivalent CDN purge mechanism.
+This starter is **Netlify-first**. Cache invalidation relies on `purgeCache` from `@netlify/functions`, which is a Netlify-specific API. `/api/cache/revalidate` calls it directly. If deploying to a different platform, this endpoint needs to be replaced with the equivalent CDN purge mechanism.
 
 No other Netlify-specific configuration is required beyond setting env vars in the Netlify dashboard.
 
@@ -303,8 +303,7 @@ No other Netlify-specific configuration is required beyond setting env vars in t
 
 | Variable | Required | Description |
 |---|---|---|
-| `SANITY_PROJECT_ID` | Yes | Sanity project ID |
+| `NUXT_SANITY_PROJECT_ID` | Yes | Sanity project ID |
 | `NUXT_SANITY_TOKEN` | Yes | Sanity API token (viewer role minimum; editor role for visual editing writes) |
 | `NUXT_SANITY_VISUAL_EDITING_STUDIO_URL` | Yes | Sanity Studio URL for visual editing overlay |
-| `NUXT_PURGE_SECRET` | Yes | Shared secret for manual cache purge endpoint |
 | `NUXT_SANITY_WEBHOOK_SECRET` | Yes (production) | Shared secret for Sanity webhook cache revalidation |

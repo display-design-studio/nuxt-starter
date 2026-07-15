@@ -29,12 +29,6 @@ export default defineEventHandler((event) => {
   if (!isPreview)
     return
   setResponseHeader(event, 'cache-control', 'no-store')
-  if (!event.context._nitro) {
-    event.context._nitro = {}
-  }
-  event.context._nitro.routeRules = {
-    cache: false,
-    swr: false,
-    isr: false,
-  }
+  event.context.nitro = event.context.nitro ?? {}
+  event.context.nitro.noCache = true
 })

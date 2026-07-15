@@ -64,8 +64,7 @@ const cdnMaxAge = 86400
  * - CDN / Nitro SWR: `s-maxage=86400, stale-while-revalidate=86400` (24 hours)
  * - Nitro cache key: `<camelCase>:<lang>`
  *
- * Cache is invalidated via the Sanity webhook (`/api/cache/revalidate`)
- * or manually via `POST /api/cache/purge`.
+ * Cache is invalidated via the Sanity webhook (`/api/cache/revalidate`).
  */
 export default defineCachedEventHandler(
   async (event) => {
@@ -187,8 +186,7 @@ const cdnMaxAge = 86400
  * - CDN / Nitro SWR: `s-maxage=86400, stale-while-revalidate=86400` (24 hours)
  * - Nitro cache key: `<camelCase>:<lang>:<slug>`
  *
- * Cache is invalidated via the Sanity webhook (`/api/cache/revalidate`)
- * or manually via `POST /api/cache/purge`.
+ * Cache is invalidated via the Sanity webhook (`/api/cache/revalidate`).
  */
 export default defineCachedEventHandler(
   async (event) => {

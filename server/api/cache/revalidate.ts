@@ -10,10 +10,7 @@ import { isValidSignature } from '@sanity/webhook'
  * Authentication: HMAC-SHA256 signature verified via `@sanity/webhook`.
  *
  * Expected body: `{ _id: string }` — the Sanity document ID that was updated.
- * Performs a granular Netlify CDN tag purge for that `_id`, then clears the
- * Nitro storage cache layer.
- *
- * For manual/emergency cache purges, use `POST /api/cache/purge` instead.
+ * Performs a granular Netlify CDN tag purge for that `_id` and `_type`.
  *
  * @returns 202 response with plain-text body `"Purged successfully!"`
  */
@@ -35,9 +32,15 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401 })
   }
 
-  const body = JSON.parse(rawBody)
+  let body: { _id?: string, _type?: string }
+  try {
+    body = JSON.parse(rawBody)
+  }
+  catch {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid JSON body' })
+  }
+
   const tags = [body?._id, body?._type].filter(Boolean)
   await purgeCache({ tags })
-  await useStorage('cache').clear()
   return new Response('Purged successfully!', { status: 202 })
 })
