@@ -3,14 +3,65 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    container_name: template-bun
-    working_dir: /app
+    container_name: app-bun
+    # Keep the exact same absolute project path as the host.
+    # This is required because Neovim sends absolute host paths
+    # to OpenCode when providing file context.
+    working_dir: ${PWD}
     user: bun
     volumes:
-      - ./:/app:Z
-      - bun_node_modules:/app/node_modules
+      # Mount the project using the same absolute path on both
+      # the host and the container so OpenCode can resolve paths
+      # received directly from Neovim.
+      - "${PWD}:${PWD}:Z"
+      # Keep container dependencies isolated from the host.
+      - bun_node_modules:${PWD}/node_modules
+      # Persist OpenCode configuration and authentication.
+      - "${HOME}/.devcontainer/opencode:/home/bun/.config/opencode:Z"
+      # Persist OpenCode sessions and application data.
+      - "${HOME}/.devcontainer/opencode-data:/home/bun/.local/share/opencode:Z"
     ports:
-      - '127.0.0.1:3000:3000'
+      # Nuxt development server.
+      - "127.0.0.1:3000:3000"
+      # OpenCode server.
+      - "127.0.0.1:4097:4096"
+    # Remove unnecessary Linux capabilities from the container.
+    cap_drop:
+      - ALL
+    # Prevent processes from gaining additional privileges.
+    security_opt:
+      - no-new-privileges:true
+    # Use an ephemeral filesystem for temporary files.
+    tmpfs:
+      - /tmp
+    # Run a minimal init process to correctly handle signals
+    # and reap orphaned child processes.
+    init: true
+    environment:
+      NODE_ENV: development
+      # Polling improves file watching reliability when the project
+      # is mounted from macOS through the Podman virtual machine.
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_INTERVAL: "1000"
+      # NODE_TLS_REJECT_UNAUTHORIZED: "0"
+    command: >
+      sh -lc 'exec bun run dev --host 0.0.0.0 --port 3000'
+
+  sanity:
+    image: node:22.22.2-slim
+    container_name: app-sanity
+    working_dir: /app/studio
+    user: node
+    volumes:
+      # Sanity does not interact with OpenCode directly, so it does
+      # not need to preserve the absolute host project path.
+      - "./:/app:Z"
+      # Keep Sanity dependencies isolated from the host.
+      - sanity_node_modules:/app/studio/node_modules
+    ports:
+      # Sanity Studio development server.
+      - "127.0.0.1:3333:3333"
     cap_drop:
       - ALL
     security_opt:
@@ -20,11 +71,12 @@ services:
     init: true
     environment:
       NODE_ENV: development
-      CHOKIDAR_USEPOLLING: 'true'
-      WATCHPACK_POLLING: 'true'
-      CHOKIDAR_INTERVAL: '1000'
-      # NODE_TLS_REJECT_UNAUTHORIZED: "0"
-    command: sh -lc 'exec bun run dev --host 0.0.0.0 --port 3000'
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_INTERVAL: "1000"
+    command: >
+      sh -lc 'npm run dev -- --host 0.0.0.0 --port 3333'
 
 volumes:
   bun_node_modules:
+  sanity_node_modules:
