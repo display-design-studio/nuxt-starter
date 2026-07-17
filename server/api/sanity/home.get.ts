@@ -48,6 +48,7 @@ export default defineCachedEventHandler(
     return result
   },
   {
+    ...sanityCacheOpts,
     maxAge: cdnMaxAge,
     shouldBypassCache: () => import.meta.dev,
     getKey: (event) => {
