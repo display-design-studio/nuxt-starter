@@ -54,25 +54,6 @@ export default defineNuxtConfig({
 
   vite: {
     plugins: [tailwindcss()],
-    optimizeDeps: {
-      include: [
-        '@nuxtjs/sanity > @sanity/client > @sanity/visual-editing',
-        '@nuxtjs/sanity > @sanity/visual-editing > @sanity/insert-menu',
-        '@nuxtjs/sanity > @sanity/visual-editing > @sanity/mutate > lodash/groupBy.js', // CJS
-        '@nuxtjs/sanity > @sanity/visual-editing > @sanity/ui > styled-components',
-        '@nuxtjs/sanity > @sanity/visual-editing > @sanity/visual-editing > react-is', // CJS
-        '@nuxtjs/sanity > @sanity/visual-editing > react', // CJS
-        '@nuxtjs/sanity > @sanity/visual-editing > react-compiler-runtime', // CJS
-        '@nuxtjs/sanity > @sanity/visual-editing > react-dom', // CJS
-        '@nuxtjs/sanity > @sanity/visual-editing > react-dom/client', // CJS
-        '@nuxtjs/sanity > @sanity/visual-editing > react/jsx-runtime', // CJS
-        '@sanity/client',
-        '@unhead/schema-org/vue',
-        '@vue/devtools-core',
-        '@vue/devtools-kit',
-        'groq',
-      ],
-    },
   },
 
   eslint: {
