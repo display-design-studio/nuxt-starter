@@ -8,6 +8,10 @@
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "minor and patch updates",
       "automerge": false
+    },
+    {
+      "matchPackageNames": ["nuxt", "@nuxt/**", "@nuxtjs/**"],
+      "groupName": "nuxt ecosystem"
     }
   ]
 }
