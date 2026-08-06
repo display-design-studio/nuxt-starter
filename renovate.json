@@ -2,7 +2,6 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["github>nuxt/renovate-config-nuxt"],
   "timezone": "Europe/Rome",
-  "schedule": ["before 6am on monday"],
   "packageRules": [
     {
       "matchUpdateTypes": ["minor", "patch"],
@@ -11,8 +10,7 @@
     },
     {
       "matchPackageNames": ["nuxt", "@nuxt/**", "@nuxtjs/**"],
-      "groupName": "nuxt ecosystem",
-      "schedule": ["before 6am on monday"]
+      "groupName": "nuxt ecosystem"
     }
   ]
 }
