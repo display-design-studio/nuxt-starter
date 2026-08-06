@@ -98,6 +98,13 @@ For containerized development, see `make help` (Docker/Podman via `compose.yml`)
 Netlify-first. ISR cache is purged via `POST /api/cache/revalidate`, triggered by a
 Sanity webhook, using `purgeCache()` from `@netlify/functions`.
 
+## Template Maintenance
+
+This repo is used as a template. The following files exist only to maintain
+*this* repository and are safe to delete once you've cloned it for your own project:
+
+- `renovate.json` — Renovate bot config scoped to this template repo
+
 ## License
 
 [MIT](./LICENSE)
