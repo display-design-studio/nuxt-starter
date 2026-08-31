@@ -1,5 +1,16 @@
-import tailwindcss from '@tailwindcss/vite'
+import { existsSync } from 'node:fs'
+import process from 'node:process'
 import { fileURLToPath } from 'node:url'
+import tailwindcss from '@tailwindcss/vite'
+
+const generatedSanityTypesUrl = new URL(
+  './studio/types/sanity.types.ts',
+  import.meta.url,
+)
+const fallbackSanityTypesUrl = new URL(
+  './shared/types/sanity.types.ts',
+  import.meta.url,
+)
 
 export default defineNuxtConfig({
   modules: [
@@ -14,7 +25,7 @@ export default defineNuxtConfig({
 
   devtools: { enabled: true },
 
-  css: ['/assets/css/main.css'],
+  css: ['~/assets/css/main.css'],
 
   site: {
     url: 'https://example.com',
@@ -22,15 +33,14 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    sanity: {
-      token: process.env.NUXT_SANITY_TOKEN,
-    },
     sanityWebhookSecret: '',
   },
 
   alias: {
     '#sanity-types': fileURLToPath(
-      new URL('./studio/types/sanity.types.ts', import.meta.url),
+      existsSync(generatedSanityTypesUrl)
+        ? generatedSanityTypesUrl
+        : fallbackSanityTypesUrl,
     ),
   },
 
@@ -38,13 +48,27 @@ export default defineNuxtConfig({
     '/**': {
       isr: 86400,
       headers: {
-        'cache-control':
-          'public, max-age=0, s-maxage=31536000, stale-while-revalidate=31536000',
+        'cache-control': 'public, max-age=0, must-revalidate',
       },
     },
-    '/api/sanity/**': { isr: false },
+    '/api/**': { isr: false },
     '/api/cache/**': {
       isr: false,
+      robots: false,
+      headers: {
+        'cache-control': 'no-store',
+      },
+    },
+    '/preview/**': {
+      isr: false,
+      robots: false,
+      headers: {
+        'cache-control': 'no-store',
+      },
+    },
+    '/_sanity/**': {
+      isr: false,
+      robots: false,
       headers: {
         'cache-control': 'no-store',
       },
@@ -100,6 +124,6 @@ export default defineNuxtConfig({
 
   sitemap: {
     sources: ['/api/__sitemap__/urls'],
-    cacheMaxAgeSeconds: 604800,
+    cacheMaxAgeSeconds: 300,
   },
 })

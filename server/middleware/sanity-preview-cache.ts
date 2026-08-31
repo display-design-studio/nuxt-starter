@@ -1,4 +1,4 @@
-import { parseCookies, setResponseHeader } from 'h3'
+import { getRequestURL, parseCookies, setResponseHeader } from 'h3'
 
 /**
  * Server middleware that disables caching for Sanity preview sessions.
@@ -7,28 +7,32 @@ import { parseCookies, setResponseHeader } from 'h3'
  * Runs on every request before route handlers.
  *
  * Behaviour:
- * - Always sets `Vary: Cookie` so CDN stores separate cache entries for
- *   authenticated (preview) and anonymous visitors.
- * - If the `sanity-preview-id` cookie is present (set by the Sanity visual
- *   editing flow), overrides cache headers to `no-store` and disables Nitro's
- *   SWR/cache for the current request, ensuring editors always see live data.
+ * - Varies Netlify page caching only on the Sanity preview cookie.
+ * - Validates the preview cookie value before bypassing page caching.
+ * - Always disables caching for the module's preview/proxy routes.
  */
 export default defineEventHandler((event) => {
   const cookies = parseCookies(event)
-
-  // Set Vary: Cookie only on page routes, not on API routes or static assets
   const path = getRequestURL(event).pathname
   const isApiRoute = path.startsWith('/api/')
-  const isStaticAsset = /\.(js|css|woff2?|ico|png|svg)$/.test(path)
+  const isStaticAsset = /\.(?:js|css|woff2?|ico|png|svg)$/.test(path)
+  const isSanityInfrastructure
+    = path.startsWith('/preview/') || path.startsWith('/_sanity/')
+
   if (!isApiRoute && !isStaticAsset) {
-    setResponseHeader(event, 'Vary', 'Cookie')
+    setResponseHeader(event, 'Netlify-Vary', 'cookie=sanity-preview-id')
   }
 
-  const isPreview = Boolean(cookies['sanity-preview-id'])
+  const config = useRuntimeConfig(event)
+  const previewModeId = config.sanity?.visualEditing?.previewModeId
+  const isPreview = Boolean(
+    previewModeId && cookies['sanity-preview-id'] === previewModeId,
+  )
 
-  if (!isPreview)
+  if (!isPreview && !isSanityInfrastructure)
     return
-  setResponseHeader(event, 'cache-control', 'no-store')
+
+  setNoStore(event)
   event.context.nitro = event.context.nitro ?? {}
   event.context.nitro.noCache = true
 })

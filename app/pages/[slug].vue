@@ -7,11 +7,23 @@ const params = computed(() => ({
   slug: route.params.slug as string,
 }))
 
-const { data: page } = await useSanityPage(params)
+const { data: page, error } = await useSanityPage(params)
 
-if (page?.value?._id) {
-  useCacheTag(`${page?.value?._id}`)
+if (error.value || !page.value) {
+  useNoStore()
+  const statusCode = error.value
+    && typeof error.value === 'object'
+    && 'statusCode' in error.value
+    ? Number(error.value.statusCode)
+    : 404
+
+  throw createError({
+    statusCode,
+    statusMessage: statusCode === 404 ? 'Page not found' : 'Failed to load page content',
+  })
 }
+
+useCacheTag([page.value._id, page.value._type])
 </script>
 
 <template>

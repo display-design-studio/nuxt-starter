@@ -12,6 +12,8 @@ bun run generate   # static site generation (SSG alternative)
 bun run preview    # preview production build
 bun run lint       # ESLint check
 bun run lint:fix   # ESLint auto-fix
+bun run test       # focused unit tests
+bun run typecheck  # Nuxt/Vue type checking
 ```
 
 ## Architecture
@@ -21,21 +23,22 @@ Nuxt 4 full-stack app with Sanity CMS, deployed on Netlify with ISR (Incremental
 ### Data-Flow Pattern (add a new document type by following all 4 steps)
 
 1. **`shared/utils/<type>Query.ts`** — define the GROQ query constant (use the `groq` template tag)
-2. **`server/api/sanity/<type>.get.ts`** — `defineCachedEventHandler` that runs the query; sets `Cache-Control: public, max-age=3600, s-maxage=86400`; assigns Netlify cache tag via `useCacheTag()`
+2. **`server/api/sanity/<type>.get.ts`** — `defineEventHandler` that validates query params, runs the published query, calls `setPublicCdnCache()` with the result `_id`/`_type`, and explicitly marks errors `no-store`
 3. **`app/composables/useSanity<Type>.ts`** — preview-aware composable: `useSanityQuery()` in preview mode, `useFetch('/api/sanity/<type>')` in production
-4. **`app/pages/*.vue`** — call the composable; `stega: false` is set automatically by the cached endpoint
+4. **`app/pages/*.vue`** — call the composable; throw on missing/upstream data before adding the result `_id`/`_type` as page cache tags
 
 ### Caching Architecture
 
-- **Browser cache**: 1 hour (`max-age=3600`)
-- **Netlify CDN**: 24 hours (`s-maxage=86400`, `stale-while-revalidate=86400`)
-- **ISR revalidation**: Sanity webhooks POST to `/api/cache/revalidate`, which calls `purgeCache()` with the document `_id` as the Netlify cache tag and clears Nitro storage
-- **Preview mode**: Bypasses all caching when `sanity-preview-id` cookie is present (handled by `server/middleware/sanity-preview-cache.ts`)
+- **Browser cache**: stores responses but revalidates every request (`max-age=0, must-revalidate`)
+- **Netlify durable CDN**: 24 hours with a 1-hour stale-while-revalidate window
+- **Sanity API CDN**: anonymous published reads use `useCdn: true`
+- **On-demand invalidation**: signed Sanity webhooks purge both page and API responses by `_id`/`_type`
+- **Preview mode**: a validated `sanity-preview-id` cookie bypasses all caching
 
 ### Key Directories
 
 - `app/` — Nuxt client app (pages, layouts, composables, assets)
-- `server/api/sanity/` — cached Nitro endpoints for each content type
+- `server/api/sanity/` — Netlify-cached endpoints for each content type
 - `server/api/cache/` — cache revalidation webhook handler
 - `shared/utils/` — isomorphic GROQ query constants
 - `i18n/locales/` — translation files (en active, it disabled)

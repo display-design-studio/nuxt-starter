@@ -3,7 +3,7 @@
     <img src="https://avatars.githubusercontent.com/u/118281951?s=400&u=3ba5b42657ae2ac1a064b998b6110ea422317790&v=0" alt="Logo" width="80" height="80">
   </a>
   <h3 align="center">Nuxt Starter</h3>
-  <p align="center">A Nuxt 4 full-stack starter wired to Sanity CMS, with two-layer ISR caching, i18n, and visual editing, deployed on Netlify.
+  <p align="center">A Nuxt 4 full-stack starter wired to Sanity CMS, with layered CDN caching, i18n, and visual editing, deployed on Netlify.
 </p>
 </div>
 <br>
@@ -11,7 +11,7 @@
 ## Features
 
 - **Sanity CMS integration** via `@nuxtjs/sanity` — typed GROQ queries, visual editing (stega), preview mode
-- **Two-layer caching** — browser (1h) + Netlify CDN ISR (24h), invalidated via Sanity webhook with per-document cache tags
+- **Three cache layers** — browser revalidation + Netlify durable CDN (24h) + Sanity API CDN, invalidated via per-document cache tags
 - **i18n** via `@nuxtjs/i18n` (`prefix_except_default` strategy — default locale unprefixed)
 - **SEO** via `@nuxtjs/seo` (sitemap, meta, schema.org)
 - **Tailwind v4** via `@tailwindcss/vite`
@@ -68,14 +68,14 @@ GROQ query results are typed end-to-end.
 ```
 app/composables/        useSanity<Type>.ts — preview-aware data fetching
 app/pages/               route components
-server/api/sanity/       cached Nitro endpoints per document type
+server/api/sanity/       Netlify-cached endpoints per document type
 server/api/cache/        webhook-driven ISR revalidation
 shared/utils/            GROQ query constants
 studio/                  Sanity Studio (added per above, not part of this template)
 ```
 
 Adding a new Sanity document type follows a 4-step pattern: GROQ query
-(`shared/utils/<type>Query.ts`) → cached endpoint (`server/api/sanity/<type>.get.ts`) →
+(`shared/utils/<type>Query.ts`) → Netlify-cached endpoint (`server/api/sanity/<type>.get.ts`) →
 preview-aware composable (`app/composables/useSanity<Type>.ts`) → page.
 
 See `STARTER.md` for the full architecture guide — caching internals, the composable

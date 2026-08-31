@@ -1,9 +1,5 @@
 import type { PageQueryResult } from '#sanity-types'
-import type { SanityQueryParams } from '~/shared/utils/queryParams'
-import { createError, getQuery, setHeader } from 'h3'
-
-const browserMaxAge = 3600
-const cdnMaxAge = 86400
+import { createError } from 'h3'
 
 /**
  * Cached endpoint to fetch a Sanity page document by slug and language.
@@ -15,46 +11,35 @@ const cdnMaxAge = 86400
  * - `lang` (optional, default `"en"`) — locale code passed to `pageQuery` as `$lang`.
  *
  * Cache behaviour:
- * - Browser: `max-age=3600` (1 hour)
- * - CDN / Nitro SWR: `s-maxage=86400, stale-while-revalidate=86400` (24 hours)
- * - Nitro cache key: `page:<lang>:<slug>`
+ * - Browser: always revalidates
+ * - Netlify durable CDN: 24 hours, with a 1-hour stale window
+ * - Sanity API CDN: enabled for the published query
  *
  * Cache is invalidated via the Sanity webhook (`/api/cache/revalidate`).
  */
-export default defineCachedEventHandler(
-  async (event) => {
-    const { lang: locale = 'en', slug = '' } = getQuery<SanityQueryParams>(event)
+export default defineEventHandler(async (event) => {
+  setNoStore(event)
+  const locale = getSanityLocale(event)
+  const slug = getSanitySlug(event)
+  const sanity = useSanity()
+  let result: PageQueryResult
 
-    setHeader(
-      event,
-      'Cache-Control',
-      `public, max-age=${browserMaxAge}, s-maxage=${cdnMaxAge}, stale-while-revalidate=${cdnMaxAge}`,
+  try {
+    result = await sanity.fetch<PageQueryResult>(
+      pageQuery,
+      { lang: locale, slug },
+      { stega: false },
     )
+  }
+  catch (error) {
+    console.error('Failed to fetch a Sanity page document', error)
+    throw createError({ statusCode: 502, statusMessage: 'Failed to fetch from Sanity' })
+  }
 
-    const sanity = useSanity()
-    let result: PageQueryResult
-    try {
-      result = await sanity.fetch<PageQueryResult>(
-        pageQuery,
-        { lang: locale, slug },
-        { stega: false },
-      )
-    }
-    catch {
-      throw createError({ statusCode: 502, statusMessage: 'Failed to fetch from Sanity' })
-    }
+  if (!result) {
+    throw createError({ statusCode: 404, statusMessage: 'Not Found' })
+  }
 
-    if (!result)
-      throw createError({ statusCode: 404, statusMessage: 'Not Found' })
-    return result
-  },
-  {
-    ...sanityCacheOpts,
-    maxAge: cdnMaxAge,
-    shouldBypassCache: () => import.meta.dev,
-    getKey: (event) => {
-      const { lang = 'en', slug = '' } = getQuery<SanityQueryParams>(event)
-      return `page:${lang}:${slug}`
-    },
-  },
-)
+  setPublicCdnCache(event, [result._id, result._type])
+  return result
+})

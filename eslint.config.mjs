@@ -12,6 +12,7 @@ export default antfu(
       '.nuxt/',
       '.output/',
       'dist/',
+      'STARTER.md',
       'studio/',
       'studio/**',
     ],

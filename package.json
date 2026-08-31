@@ -10,7 +10,9 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "test": "bun test",
+    "typecheck": "nuxt typecheck"
   },
   "dependencies": {
     "@netlify/functions": "^6.0.0",
@@ -34,6 +36,8 @@
   "devDependencies": {
     "@antfu/eslint-config": "^9.3.0",
     "@sanity-labs/eslint-plugin": "^1.0.0",
-    "eslint-plugin-tailwindcss": "^4.4.0"
+    "eslint-plugin-tailwindcss": "^4.4.0",
+    "typescript": "^6.0.0",
+    "vue-tsc": "^3.3.11"
   }
 }

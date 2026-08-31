@@ -13,18 +13,18 @@ services:
       # Mount the project using the same absolute path on both
       # the host and the container so OpenCode can resolve paths
       # received directly from Neovim.
-      - "${PWD}:${PWD}:Z"
+      - '${PWD}:${PWD}:Z'
       # Keep container dependencies isolated from the host.
       - bun_node_modules:${PWD}/node_modules
       # Persist OpenCode configuration and authentication.
-      - "${HOME}/.devcontainer/opencode:/home/bun/.config/opencode:Z"
+      - '${HOME}/.devcontainer/opencode:/home/bun/.config/opencode:Z'
       # Persist OpenCode sessions and application data.
-      - "${HOME}/.devcontainer/opencode-data:/home/bun/.local/share/opencode:Z"
+      - '${HOME}/.devcontainer/opencode-data:/home/bun/.local/share/opencode:Z'
     ports:
       # Nuxt development server.
-      - "127.0.0.1:3000:3000"
+      - '127.0.0.1:3000:3000'
       # OpenCode server.
-      - "127.0.0.1:4097:4096"
+      - '127.0.0.1:4097:4096'
     # Remove unnecessary Linux capabilities from the container.
     cap_drop:
       - ALL
@@ -41,9 +41,9 @@ services:
       NODE_ENV: development
       # Polling improves file watching reliability when the project
       # is mounted from macOS through the Podman virtual machine.
-      CHOKIDAR_USEPOLLING: "true"
-      WATCHPACK_POLLING: "true"
-      CHOKIDAR_INTERVAL: "1000"
+      CHOKIDAR_USEPOLLING: 'true'
+      WATCHPACK_POLLING: 'true'
+      CHOKIDAR_INTERVAL: '1000'
       # NODE_TLS_REJECT_UNAUTHORIZED: "0"
     command: >
       sh -lc 'exec bun run dev --host 0.0.0.0 --port 3000'
@@ -56,12 +56,12 @@ services:
     volumes:
       # Sanity does not interact with OpenCode directly, so it does
       # not need to preserve the absolute host project path.
-      - "./:/app:Z"
+      - './:/app:Z'
       # Keep Sanity dependencies isolated from the host.
       - sanity_node_modules:/app/studio/node_modules
     ports:
       # Sanity Studio development server.
-      - "127.0.0.1:3333:3333"
+      - '127.0.0.1:3333:3333'
     cap_drop:
       - ALL
     security_opt:
@@ -71,9 +71,9 @@ services:
     init: true
     environment:
       NODE_ENV: development
-      CHOKIDAR_USEPOLLING: "true"
-      WATCHPACK_POLLING: "true"
-      CHOKIDAR_INTERVAL: "1000"
+      CHOKIDAR_USEPOLLING: 'true'
+      WATCHPACK_POLLING: 'true'
+      CHOKIDAR_INTERVAL: '1000'
     command: >
       sh -lc 'npm run dev -- --host 0.0.0.0 --port 3333'
 

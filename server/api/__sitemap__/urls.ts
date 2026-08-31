@@ -1,5 +1,3 @@
-import { defineSitemapEventHandler } from '#imports'
-
 // NOTE: `slug` is assumed to be a per-language object (`slug[$lang].current`),
 // matching `shared/utils/pageQuery.ts` and the i18n setup (`prefix_except_default`
 // with multiple locales). Verify against the real schema in `studio/` once it is
@@ -14,7 +12,8 @@ export default defineSitemapEventHandler(async () => {
       { stega: false },
     )
   }
-  catch {
+  catch (error) {
+    console.error('Failed to fetch Sanity pages for the sitemap', error)
     throw createError({ statusCode: 502, statusMessage: 'Failed to fetch from Sanity' })
   }
 
