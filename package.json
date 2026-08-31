@@ -21,7 +21,7 @@
     "@nuxtjs/i18n": "10.6.0",
     "@nuxtjs/sanity": "2.5.0",
     "@nuxtjs/seo": "5.3.14",
-    "@sanity/client": "^7.26.2",
+    "@sanity/client": "^8.4.0",
     "@sanity/webhook": "^4.0.4",
     "@tailwindcss/vite": "^4.3.3",
     "@unhead/vue": "^3.4.0",
