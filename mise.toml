@@ -1,0 +1,168 @@
+[env]
+# Project
+PROJECT_ROOT = "{{config_root}}"
+PROJECT_NAME = "app"
+COMPOSE_PROJECT_NAME = "{{env.PROJECT_NAME}}"
+IMAGE_NAME = "app"
+CONTAINER_NAME = "app-prod"
+
+# Application
+APP_PORT = "3000"
+SANITY_PORT = "3333"
+
+# OpenCode
+OPENCODE_HOST_PORT = "4097"
+
+# Local environment
+_.file = ".env"
+
+[tools]
+bun = "1.3"
+node = "22.22.2"
+
+# =============================================================================
+# Development containers
+# =============================================================================
+
+[tasks.up]
+description = "Start all development services"
+run = "podman compose up -d"
+
+[tasks.down]
+description = "Stop and remove development services"
+run = "podman compose down"
+
+[tasks.restart]
+description = "Restart development services"
+run = "podman compose restart"
+
+[tasks.build]
+description = "Build development images"
+run = "podman compose build"
+
+[tasks.rebuild]
+description = "Rebuild and restart development services"
+run = "podman compose up -d --build"
+
+[tasks.ps]
+description = "Show running development services"
+run = "podman compose ps"
+
+
+# =============================================================================
+# Dependencies
+# =============================================================================
+
+[tasks.install-bun]
+description = "Install Bun application dependencies"
+run = "podman compose run --rm app bun install"
+
+[tasks.install-sanity]
+description = "Install Sanity dependencies"
+run = "podman compose run --rm sanity npm install --legacy-peer-deps"
+
+# =============================================================================
+# Logs
+# =============================================================================
+
+[tasks.logs]
+description = "Follow Bun application logs"
+run = "podman compose logs -f app"
+
+[tasks.logs-sanity]
+description = "Follow Sanity logs"
+run = "podman compose logs -f sanity"
+
+
+# =============================================================================
+# Shells
+# =============================================================================
+
+[tasks.shell-bun]
+description = "Open a shell in the Bun container"
+run = "podman compose exec app sh"
+
+[tasks.shell-sanity]
+description = "Open a shell in the Sanity container"
+run = "podman compose exec sanity sh"
+
+
+# =============================================================================
+# OpenCode
+# =============================================================================
+
+[tasks.opencode]
+description = "Start the OpenCode server"
+run = "podman compose exec app opencode --hostname 0.0.0.0 --port 4096"
+
+# =============================================================================
+# Production
+# =============================================================================
+
+[tasks.prod-build]
+description = "Build the production image"
+run = "podman build -t $IMAGE_NAME ."
+
+[tasks.prod-run]
+description = "Run the production container"
+run = """
+podman run --rm \
+  --name "$CONTAINER_NAME" \
+  -p "127.0.0.1:$APP_PORT:3000" \
+  "$IMAGE_NAME"
+"""
+
+[tasks.prod-stop]
+description = "Stop the production container"
+run = 'podman stop "$CONTAINER_NAME" || true'
+
+[tasks.prod-clean]
+description = "Remove the production container and image"
+run = """
+podman rm -f "$CONTAINER_NAME" || true
+podman rmi "$IMAGE_NAME" || true
+"""
+
+# =============================================================================
+# Status
+# =============================================================================
+
+[tasks.status]
+description = "Show project status"
+quiet = true
+run = """
+printf '\nProject\n'
+printf '  name      %s\n' "$(basename "$PROJECT_ROOT")"
+printf '  root      %s\n' "$PROJECT_ROOT"
+printf '  branch    %s\n' "$(git branch --show-current 2>/dev/null || echo '-')"
+printf '  changes   %s\n' "$(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')"
+
+printf '\nEnvironment\n'
+
+if command -v mise >/dev/null 2>&1; then
+  printf '  mise      configured\n'
+else
+  printf '  mise      unavailable\n'
+fi
+
+if podman info >/dev/null 2>&1; then
+  printf '  podman    running\n'
+else
+  printf '  podman    stopped\n'
+fi
+
+printf '\nServices\n'
+
+if podman compose ps -q 2>/dev/null | grep -q .; then
+  podman compose ps
+else
+  printf '  none running\n'
+fi
+
+printf '\nPorts\n'
+printf '  app       %s\n' "${APP_PORT:-not configured}"
+printf '  sanity    %s\n' "${SANITY_PORT:-not configured}"
+printf '  opencode  %s\n' "${OPENCODE_HOST_PORT:-not configured}"
+
+printf '\n'
+"""

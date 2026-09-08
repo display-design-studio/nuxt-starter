@@ -21,7 +21,7 @@ node_modules
 
 studio/.sanity
 studio/dist
-
+studio
 
 # =============================================================================
 # Build and cache directories
@@ -120,5 +120,3 @@ temp
 **/tmp
 **/temp
 **/.tmp
-
-.nvim.json
