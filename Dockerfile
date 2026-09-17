@@ -4,7 +4,7 @@
 # Dependencies
 # =============================================================================
 
-FROM oven/bun:1.3 AS deps
+FROM oven/bun:1.4 AS deps
 
 WORKDIR /app
 
@@ -19,7 +19,7 @@ RUN bun install --frozen-lockfile
 # Build
 # =============================================================================
 
-FROM oven/bun:1.3 AS builder
+FROM oven/bun:1.4 AS builder
 
 WORKDIR /app
 
@@ -43,7 +43,7 @@ RUN bun run build
 # Production runtime
 # =============================================================================
 
-FROM node:22.22.2-slim AS runner
+FROM node:22.23.2-slim AS runner
 
 WORKDIR /app
 
