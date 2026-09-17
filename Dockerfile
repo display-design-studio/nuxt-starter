@@ -43,7 +43,7 @@ RUN bun run build
 # Production runtime
 # =============================================================================
 
-FROM node:22.22.2-slim AS runner
+FROM node:24.21.0-slim AS runner
 
 WORKDIR /app
 
