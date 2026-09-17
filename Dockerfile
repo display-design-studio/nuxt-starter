@@ -25,6 +25,9 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NITRO_PRESET=node-server
+# Limit Node.js heap usage during the Nuxt/Nitro build so the build
+# cannot consume most of the Podman VM memory.
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 
 # Reuse the dependencies installed in the previous stage.
 COPY --from=deps /app/node_modules ./node_modules
@@ -40,7 +43,7 @@ RUN bun run build
 # Production runtime
 # =============================================================================
 
-FROM node:24.20.0-slim AS runner
+FROM node:22.23.2-slim AS runner
 
 WORKDIR /app
 
