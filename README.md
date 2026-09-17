@@ -15,7 +15,7 @@
 - **i18n** via `@nuxtjs/i18n` (`prefix_except_default` strategy — default locale unprefixed)
 - **SEO** via `@nuxtjs/seo` (sitemap, meta, schema.org)
 - **Tailwind v4** via `@tailwindcss/vite`
-- **Docker/Podman** setup for local development (`compose.yml`, `Makefile`)
+- **Docker/Podman** setup for local development (`compose.yml`, `Dockerfile.dev`)
 
 ## Tech Stack
 
@@ -91,7 +91,7 @@ pattern, cache invalidation endpoints, and code examples for each step.
 | `bun run preview` | Preview production build |
 | `bun run lint` / `lint:fix` | ESLint check / auto-fix |
 
-For containerized development, see `make help` (Docker/Podman via `compose.yml`).
+For containerized development, see [Local Container Development](#local-container-development).
 
 ## Deployment
 
@@ -108,3 +108,51 @@ This repo is used as a template. The following files exist only to maintain
 ## License
 
 [MIT](./LICENSE)
+
+## Local Container Development
+
+The development application can run in a Docker or Podman container while Caddy
+runs on the host. The container isolates project dependencies and exposes Nuxt
+only on `127.0.0.1`; Caddy provides a stable local domain and HTTPS in front of it.
+
+### Prerequisites
+
+- Docker Compose or Podman Compose
+- [Caddy](https://caddyserver.com/docs/install) installed on the host
+
+### Start the Application
+
+Start the Nuxt development container. `APP_PORT` is the host port Caddy proxies
+to and defaults to `3000`:
+
+```bash
+APP_PORT=3000 docker compose up --build app
+```
+
+Use `podman compose` instead of `docker compose` when using Podman. The optional
+`sanity` service requires the Studio to have been added under `studio/` as described
+above.
+
+### Start Caddy
+
+In another terminal, start Caddy from the project root. A `.localhost` hostname
+resolves to the local machine without an `/etc/hosts` entry:
+
+```bash
+DEV_HOST=nuxt-starter.localhost APP_PORT=3000 caddy run --config Caddyfile
+```
+
+Open [https://nuxt-starter.localhost:8443](https://nuxt-starter.localhost:8443).
+The `Caddyfile` deliberately uses ports `8080` and `8443`, so the HTTPS port must
+remain in the URL.
+
+Caddy creates a certificate through its internal local CA (`tls internal`). Trust
+that CA once on the host to avoid browser certificate warnings:
+
+```bash
+caddy trust
+```
+
+This command may request administrator privileges. Use a different local name by
+changing `DEV_HOST`; use the same `APP_PORT` value for Compose and Caddy if you
+override the default.
