@@ -1,0 +1,10 @@
+{
+	http_port 8080
+	https_port 8443
+	default_bind 127.0.0.1
+}
+
+{$DEV_HOST} {
+	tls internal
+	reverse_proxy 127.0.0.1:{$APP_PORT}
+}

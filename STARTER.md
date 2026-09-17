@@ -157,9 +157,29 @@ Runs on every request before route handlers:
 API and page responses are tagged with the Sanity document `_id` and `_type`.
 
 ```ts
-// In a page component (server-side only)
-useCacheTag(home.value._id)
+// Single-document page (server-side only)
+useCacheTag([home.value._id, home.value._type])
 ```
+
+Listing pages must also tag every document type that can be added to the listing. Tags only for
+the documents currently rendered cannot invalidate a cached listing when a new document is
+published, because its `_id` was not present when the response was cached.
+
+```ts
+// Listing page: `hub` describes the page and `items` contains `page` documents.
+// Keep the null guards in place before accessing these values.
+useCacheTag([
+  data.value.hub._id,
+  data.value.hub._type,
+  'page',
+  ...data.value.items.map(page => page._id),
+])
+```
+
+When a new `page` document is published, the webhook purges its `_type` tag (`page`), which
+also invalidates this listing. Include each listed type for collections with multiple document
+types. Pass all tags in one `useCacheTag` call: it sets the response header and later calls
+overwrite earlier tags.
 
 ### Cache invalidation
 
@@ -250,9 +270,24 @@ const { locale } = useI18n()
 const { data } = await useSanity<Type>({ lang: locale.value })
 
 if (data.value?._id) {
-  useCacheTag(data.value._id)
+  useCacheTag([data.value._id, data.value._type])
 }
 </script>
+```
+
+For listing pages, add the static type tag for each collection of documents so newly published
+documents invalidate the cached listing. Keep the existing null guards before accessing the
+listing container, category, or items.
+
+```ts
+if (data.value?.hub && data.value.items) {
+  useCacheTag([
+    data.value.hub._id,
+    data.value.hub._type,
+    'page',
+    ...data.value.items.map(page => page._id),
+  ])
+}
 ```
 
 ### Placeholder pages
@@ -269,7 +304,7 @@ const route = useRoute()
 const { locale } = useI18n()
 const { data: page } = await useSanityPage({ lang: locale.value, slug: route.params.slug as string })
 if (page.value?._id)
-  useCacheTag(page.value._id)
+  useCacheTag([page.value._id, page.value._type])
 </script>
 ```
 
