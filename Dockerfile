@@ -4,7 +4,7 @@
 # Dependencies
 # =============================================================================
 
-FROM oven/bun:1.3 AS deps
+FROM oven/bun:1.4 AS deps
 
 WORKDIR /app
 
@@ -19,7 +19,7 @@ RUN bun install --frozen-lockfile
 # Build
 # =============================================================================
 
-FROM oven/bun:1.3 AS builder
+FROM oven/bun:1.4 AS builder
 
 WORKDIR /app
 
