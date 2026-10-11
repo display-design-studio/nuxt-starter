@@ -19,7 +19,7 @@
     "@nuxt/a11y": "1.0.0-alpha.1",
     "@nuxt/eslint": "1.17.0",
     "@nuxt/hints": "1.1.4",
-    "@nuxt/scripts": "1.3.9",
+    "@nuxt/scripts": "1.3.12",
     "@nuxtjs/i18n": "10.6.0",
     "@nuxtjs/sanity": "2.5.0",
     "@nuxtjs/seo": "5.3.16",
@@ -29,7 +29,7 @@
     "@tailwindcss/vite": "^4.3.3",
     "@unhead/vue": "^3.4.1",
     "eslint": "^10.10.0",
-    "nuxt": "^4.5.2",
+    "nuxt": "^4.6.1",
     "tailwindcss": "^4.3.3",
     "vue": "^3.5.42",
     "vue-router": "^5.3.1"
