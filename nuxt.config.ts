@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
+import { DEFAULT_LOCALE, LOCALES } from './shared/utils/locales'
 
 const generatedSanityTypesUrl = new URL(
   './studio/types/sanity.types.ts',
@@ -12,11 +13,14 @@ const fallbackSanityTypesUrl = new URL(
   import.meta.url,
 )
 
+// Dev-only tooling lives in devDependencies and is not loaded by production builds.
+const devModules = process.env.NODE_ENV === 'production'
+  ? []
+  : ['@nuxt/a11y', '@nuxt/eslint', '@nuxt/hints']
+
 export default defineNuxtConfig({
   modules: [
-    '@nuxt/a11y',
-    '@nuxt/eslint',
-    '@nuxt/hints',
+    ...devModules,
     '@nuxt/scripts',
     '@nuxtjs/sanity',
     '@nuxtjs/i18n',
@@ -25,12 +29,21 @@ export default defineNuxtConfig({
 
   devtools: { enabled: true },
 
+  hooks: {
+    // Visual editing overlay (React + @sanity/ui, ~780 kB) is only needed in
+    // preview sessions: stop Nuxt from prefetching it for every visitor.
+    'build:manifest': (manifest) => {
+      for (const entry of Object.values(manifest)) {
+        if (entry.isDynamicEntry && /visual-editing/.test(entry.src ?? ''))
+          entry.prefetch = entry.preload = false
+      }
+    },
+  },
+
   css: ['~/assets/css/main.css'],
 
-  site: {
-    url: 'https://example.com',
-    name: 'My Site',
-  },
+  // Site URL: set `NUXT_PUBLIC_SITE_URL` (Netlify's `URL` is detected automatically).
+  // Site name and description come from `nuxtSiteConfig` in `i18n/locales/*.json`.
 
   runtimeConfig: {
     sanityWebhookSecret: '',
@@ -80,25 +93,10 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
 
-  eslint: {
-    config: {
-      stylistic: {
-        indent: 2,
-        quotes: 'single',
-        semi: false,
-        commaDangle: 'always-multiline',
-        braceStyle: 'stroustrup',
-      },
-    },
-  },
-
   i18n: {
     strategy: 'prefix_except_default',
-    defaultLocale: 'en',
-    locales: [
-      { code: 'en', name: 'English', file: 'en.json' },
-      // { code: "it", name: "Italian", file: "it.json" },
-    ],
+    defaultLocale: DEFAULT_LOCALE,
+    locales: LOCALES.map(({ code, name }) => ({ code, name, file: `${code}.json` })),
   },
 
   ogImage: {
