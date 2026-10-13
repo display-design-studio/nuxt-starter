@@ -1,10 +1,14 @@
+<script setup lang="ts">
+const { t } = useI18n()
+</script>
+
 <template>
   <div>
     <NuxtLinkLocale to="/">
-      Home
+      {{ t('nav.home') }}
     </NuxtLinkLocale>
-    <NuxtLinkLocale to="/ciao">
-      Ciao
+    <NuxtLinkLocale to="/hello-world">
+      {{ t('nav.example') }}
     </NuxtLinkLocale>
     <div>
       <slot />

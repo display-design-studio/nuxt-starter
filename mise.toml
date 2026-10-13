@@ -48,7 +48,6 @@ run = "podman compose up -d --build"
 description = "Show running development services"
 run = "podman compose ps"
 
-
 # =============================================================================
 # Dependencies
 # =============================================================================
@@ -72,7 +71,6 @@ run = "podman compose logs -f app"
 [tasks.logs-sanity]
 description = "Follow Sanity logs"
 run = "podman compose logs -f sanity"
-
 
 # =============================================================================
 # Shells

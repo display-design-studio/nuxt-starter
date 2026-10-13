@@ -16,9 +16,10 @@ useCacheTag([home.value._id, home.value._type])
 
 <template>
   <div>
-    <h1>
+    <h1>{{ home.title }}</h1>
+    <h2>
       Data:
-    </h1>
+    </h2>
     <pre>{{ home }} </pre>
   </div>
 </template>

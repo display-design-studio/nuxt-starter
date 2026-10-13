@@ -4,6 +4,11 @@
   "timezone": "Europe/Rome",
   "packageRules": [
     {
+      "matchPackageNames": ["typescript"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "minor and patch updates",
       "automerge": false

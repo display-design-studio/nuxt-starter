@@ -7,17 +7,20 @@ defineProps<{
   }
 }>()
 
-const handleError = () => clearError({ redirect: '/' })
+const { t } = useI18n()
+const localePath = useLocalePath()
+
+const handleError = () => clearError({ redirect: localePath('/') })
 </script>
 
 <template>
   <div>
     <h1>{{ error.statusCode }}</h1>
     <p>
-      {{ error.statusCode === 404 ? "Page not found" : "An error occurred" }}
+      {{ error.statusCode === 404 ? t('error.notFound') : t('error.generic') }}
     </p>
     <button @click="handleError">
-      Go home
+      {{ t('error.goHome') }}
     </button>
   </div>
 </template>

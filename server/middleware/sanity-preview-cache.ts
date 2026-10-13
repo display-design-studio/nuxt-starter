@@ -14,12 +14,8 @@ import { getRequestURL, parseCookies, setResponseHeader } from 'h3'
 export default defineEventHandler((event) => {
   const cookies = parseCookies(event)
   const path = getRequestURL(event).pathname
-  const isApiRoute = path.startsWith('/api/')
-  const isStaticAsset = /\.(?:js|css|woff2?|ico|png|svg)$/.test(path)
-  const isSanityInfrastructure
-    = path.startsWith('/preview/') || path.startsWith('/_sanity/')
 
-  if (!isApiRoute && !isStaticAsset) {
+  if (!isApiPath(path) && !isStaticAssetPath(path)) {
     setResponseHeader(event, 'Netlify-Vary', 'cookie=sanity-preview-id')
   }
 
@@ -29,7 +25,7 @@ export default defineEventHandler((event) => {
     previewModeId && cookies['sanity-preview-id'] === previewModeId,
   )
 
-  if (!isPreview && !isSanityInfrastructure)
+  if (!isPreview && !isSanityInfrastructurePath(path))
     return
 
   setNoStore(event)
