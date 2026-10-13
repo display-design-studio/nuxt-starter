@@ -12,9 +12,10 @@ export default antfu(
       '.nuxt/',
       '.output/',
       'dist/',
-      'STARTER.md',
       'studio/',
       'studio/**',
+      // Docs contain code fragments and `<type>` placeholders, not lintable code.
+      'README.md',
     ],
   },
 
