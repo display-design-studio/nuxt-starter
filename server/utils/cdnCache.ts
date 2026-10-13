@@ -1,5 +1,6 @@
 import type { H3Event } from 'h3'
 import { setResponseHeader } from 'h3'
+import { noStoreHeaders } from '../../shared/utils/cacheHeaders'
 
 const netlifyMaxAge = 86400
 const netlifyStaleWhileRevalidate = 3600
@@ -19,6 +20,6 @@ export function setPublicCdnCache(event: H3Event, tags: string[]) {
 }
 
 export function setNoStore(event: H3Event) {
-  setResponseHeader(event, 'Cache-Control', 'no-store')
-  setResponseHeader(event, 'Netlify-CDN-Cache-Control', 'no-store')
+  for (const [name, value] of Object.entries(noStoreHeaders))
+    setResponseHeader(event, name, value)
 }

@@ -1,6 +1,7 @@
 export type HomeQueryResult = {
   _id: string
   _type: 'home'
+  title: string | null
 } | null
 
 export type PageQueryResult = {

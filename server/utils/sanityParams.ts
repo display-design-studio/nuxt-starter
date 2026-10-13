@@ -1,7 +1,6 @@
 import type { H3Event } from 'h3'
 import { createError, getQuery } from 'h3'
-
-export const SUPPORTED_LOCALES = ['en'] as const
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '../../shared/utils/locales'
 
 function requireSingleValue(value: unknown, name: string, maxLength: number) {
   if (typeof value !== 'string' || value.length === 0 || value.length > maxLength) {
@@ -17,7 +16,7 @@ function requireSingleValue(value: unknown, name: string, maxLength: number) {
 export function validateSanityLocale(value: unknown) {
   const locale = requireSingleValue(value, 'lang', 16)
 
-  if (!SUPPORTED_LOCALES.includes(locale as (typeof SUPPORTED_LOCALES)[number]))
+  if (!SUPPORTED_LOCALES.includes(locale))
     throw createError({ statusCode: 400, statusMessage: 'Unsupported lang' })
 
   return locale
@@ -33,7 +32,7 @@ export function validateSanitySlug(slug: unknown) {
 }
 
 export function getSanityLocale(event: H3Event) {
-  const { lang = 'en' } = getQuery(event)
+  const { lang = DEFAULT_LOCALE } = getQuery(event)
   return validateSanityLocale(lang)
 }
 

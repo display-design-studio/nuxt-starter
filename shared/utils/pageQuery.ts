@@ -6,20 +6,16 @@ import { defineQuery } from 'groq'
  * @remarks
  * Used by `server/api/sanity/page.get.ts` via `useSanity().fetch()`.
  * Requires two GROQ parameters:
- * - `$slug` — the page slug (matches `slug[$lang].current`, a per-language slug object)
- * - `$lang` — the locale code (matches `language`, and selects the slug object key)
+ * - `$slug` — the page slug (matches `slug[$lang].current`, a `localeSlug` object keyed by locale)
+ * - `$lang` — the locale code (selects the slug object key)
  *
  * @remarks
- * NOTE: `slug` is assumed to be a per-language object keyed by locale
- * (`slug[$lang].current`), consistent with `server/api/__sitemap__/urls.ts`
- * and the i18n setup (`prefix_except_default` with multiple locales).
- * Verify this against the real schema in `studio/` once it is cloned
- * locally (see README.md) — this repo has no `studio/` folder to check
- * against.
+ * Pages have no `language` field: the locale lives in the `localeSlug` keys
+ * (verified against the deployed schema).
  *
  * @returns `PageQueryResult` — full page document or `null` if not found.
  */
 export const pageQuery
-  = defineQuery(`*[_type == "page" && slug[$lang].current == $slug && language == $lang][0]{
+  = defineQuery(`*[_type == "page" && slug[$lang].current == $slug][0]{
   ...
 }`)

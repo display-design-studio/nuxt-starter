@@ -8,6 +8,6 @@ export function useNoStore() {
   if (!event)
     return
 
-  setResponseHeader(event, 'Cache-Control', 'no-store')
-  setResponseHeader(event, 'Netlify-CDN-Cache-Control', 'no-store')
+  for (const [name, value] of Object.entries(noStoreHeaders))
+    setResponseHeader(event, name, value)
 }

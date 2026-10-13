@@ -2,5 +2,14 @@
   "nuxtSiteConfig": {
     "name": "Nuxt Starter",
     "description": "Nuxt Starter Description"
+  },
+  "nav": {
+    "home": "Home",
+    "example": "Example page"
+  },
+  "error": {
+    "notFound": "Page not found",
+    "generic": "An error occurred",
+    "goHome": "Go home"
   }
 }
