@@ -6,7 +6,9 @@ const netlifyMaxAge = 86400
 const netlifyStaleWhileRevalidate = 3600
 
 export function setPublicCdnCache(event: H3Event, tags: string[]) {
-  const uniqueTags = [...new Set(tags.filter(Boolean))]
+  const uniqueTags = [
+    ...new Set(tags.filter(Boolean)),
+  ]
 
   setResponseHeader(event, 'Cache-Control', 'public, max-age=0, must-revalidate')
   setResponseHeader(

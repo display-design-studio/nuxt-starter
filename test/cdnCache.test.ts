@@ -7,7 +7,10 @@ import { setNoStore, setPublicCdnCache } from '../server/utils/cdnCache'
 function createTestEvent() {
   const req = new IncomingMessage(new Socket())
   const res = new ServerResponse(req)
-  return { event: createEvent(req, res), res }
+  return {
+    event: createEvent(req, res),
+    res,
+  }
 }
 
 describe('CDN cache headers', () => {

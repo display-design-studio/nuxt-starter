@@ -21,7 +21,14 @@ export function buildSitemapEntries(pages: SitemapPage[]) {
   return pages.flatMap(({ slug }) =>
     SUPPORTED_LOCALES.flatMap((language) => {
       const current = slug?.[language]?.current
-      return current ? [{ loc: localizedPath(language, current), _sitemap: language }] : []
+      return current
+        ? [
+            {
+              loc: localizedPath(language, current),
+              _sitemap: language,
+            },
+          ]
+        : []
     }),
   )
 }

@@ -16,5 +16,7 @@ export const SUPPORTED_LOCALES: readonly string[] = LOCALES.map(locale => locale
 
 /** Path for a slug in a locale, following the `prefix_except_default` strategy. */
 export function localizedPath(locale: string, slug: string) {
-  return locale === DEFAULT_LOCALE ? `/${slug}` : `/${locale}/${slug}`
+  return locale === DEFAULT_LOCALE
+    ? `/${slug}`
+    : `/${locale}/${slug}`
 }
