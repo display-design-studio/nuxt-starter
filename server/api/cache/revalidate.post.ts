@@ -27,7 +27,9 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = parseRevalidateBody(rawBody)
-  await purgeCache({ tags: [body._id, body._type] })
+  await purgeCache({
+    tags: [body._id, body._type],
+  })
 
   return new Response('Purged successfully!', { status: 202 })
 })

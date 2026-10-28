@@ -32,7 +32,9 @@ export const groqSyntax = {
         catch (err) {
           context.report({
             node: arg,
-            message: `GROQ syntax error: ${err instanceof Error ? err.message : String(err)}`,
+            message: `GROQ syntax error: ${err instanceof Error
+              ? err.message
+              : String(err)}`,
           })
         }
       },

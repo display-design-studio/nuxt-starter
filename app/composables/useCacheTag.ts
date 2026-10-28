@@ -8,7 +8,9 @@ export function useCacheTag(tag: string | string[]) {
   if (!event)
     return
 
-  const value = Array.isArray(tag) ? tag.join(',') : tag
+  const value = Array.isArray(tag)
+    ? tag.join(',')
+    : tag
 
   setResponseHeader(event, 'Netlify-Cache-Tag', value)
 }
