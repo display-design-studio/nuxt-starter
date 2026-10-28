@@ -1,5 +1,5 @@
 # Use the official Bun image as the base development environment.
-FROM node:24.21.0-slim AS node
+FROM node:24.22.0-slim AS node
 FROM oven/bun:1.4
 
 # Set the application directory as the default working directory.
