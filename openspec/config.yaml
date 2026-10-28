@@ -1,0 +1,34 @@
+schema: spec-driven
+
+context: |
+  AGENTS.md and .context/*.md are owner-managed project policy.
+  The Planner is non-executing: it may create and revise OpenSpec planning
+  artifacts, but it does not implement product changes or edit project context.
+  Features, refactors, architectural decisions, and durable behavior changes
+  require OpenSpec. Narrow fixes and routine maintenance may be planned in chat.
+
+rules:
+  proposal:
+    - State the user outcome and why the change deserves durable tracking.
+    - State meaningful exclusions so implementation boundaries are explicit.
+    - Identify durable capabilities rather than naming implementation tasks.
+  design:
+    - Distinguish owner decisions from repository facts and proposed defaults.
+    - Resolve choices that would change scope, behavior, or task breakdown before tasks are written.
+  specs:
+    - Express externally observable behavior and failure conditions without copying implementation details.
+  tasks:
+    - Order tasks by dependency and keep each task achievable in one execution session.
+    - Give every task an observable verification method.
+    - Include documentation, compatibility, migration, or cleanup work in the relevant task group when required.
+
+operations:
+  apply:
+    guidance:
+      - Preserve owner-managed context unless the selected change and current user request explicitly authorize editing it.
+      - Report verification performed without treating planning artifacts as evidence of implementation.
+  archive:
+    guidance:
+      - Synchronize and verify delta requirements in durable specs before considering archive pruning.
+      - Keep only the 10 most recent archived changes; never count or remove active changes.
+      - Stop pruning when synchronization of the oldest archive cannot be verified.

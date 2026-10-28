@@ -1,66 +1,68 @@
 # AGENTS.md
 
-This file provides guidance to coding agents (Claude Code, Codex, etc.) working in this repository. Human-facing docs live in `README.md`.
+This file is the entry point for agents working in this repository. Human-facing documentation lives in `README.md`; durable agent knowledge lives in `.context/`.
 
-## Commands
+## Project Identity
 
-```bash
-bun install        # install dependencies
-bun run dev        # start dev server at http://localhost:3000
-bun run build      # production build
-bun run generate   # static site generation (SSG alternative)
-bun run preview    # preview production build
-bun run lint       # ESLint check
-bun run lint:fix   # ESLint auto-fix
-bun run test       # focused unit tests
-bun run typecheck  # Nuxt/Vue type checking
-```
+- **Name:** Nuxt Starter
+- **Mode:** starter
+- **Type:** full-stack Nuxt and Sanity web project starter
+- **Purpose:** provide Display projects with a production-oriented baseline for content-driven websites deployed on Netlify
 
-## Architecture
+When creating a project from this starter, the project owner must replace this section with the new project's name, mode, type, and purpose. Until that definition is complete, the Planner must stop substantive planning, ask focused questions, and propose exact replacement text. The project owner applies changes to this file and `.context/`.
 
-Nuxt 4 full-stack app with Sanity CMS, deployed on Netlify with ISR (Incremental Static Regeneration).
+## Context Contract
 
-### Data-Flow Pattern (add a new document type by following all 4 steps)
+Before substantive planning or implementation:
 
-1. **`shared/utils/<type>Query.ts`** — define the GROQ query constant (use the `groq` template tag)
-2. **`server/api/sanity/<type>.get.ts`** — `defineEventHandler` that validates query params, runs the published query, calls `setPublicCdnCache()` with the result `_id`/`_type`, and explicitly marks errors `no-store`
-3. **`app/composables/useSanity<Type>.ts`** — preview-aware composable: `useSanityQuery()` in preview mode, `useFetch('/api/sanity/<type>')` in production
-4. **`app/pages/*.vue`** — call the composable; throw on missing/upstream data before adding the result `_id`/`_type` as page cache tags
+1. Read this file.
+2. Read every Markdown file currently present in `.context/`.
+3. Read the relevant active OpenSpec change, when one exists.
+4. Inspect the repository sources needed to validate discoverable facts.
 
-### Caching Architecture
+Repository-level instructions are resolved in this order:
 
-- **Browser cache**: stores responses but revalidates every request (`max-age=0, must-revalidate`)
-- **Netlify durable CDN**: 24 hours with a 1-hour stale-while-revalidate window
-- **Sanity API CDN**: anonymous published reads use `useCdn: true`
-- **On-demand invalidation**: signed Sanity webhooks purge both page and API responses by `_id`/`_type`
-- **Preview mode**: a validated `sanity-preview-id` cookie bypasses all caching
+1. Current user request
+2. `AGENTS.md`
+3. `.context/*.md`
+4. Active OpenSpec change artifacts
 
-### Key Directories
+Higher-level system or tool restrictions still take precedence. If repository sources conflict, follow the order above and report conflicts that affect the result.
 
-- `app/` — Nuxt client app (pages, layouts, composables, assets)
-- `server/api/sanity/` — Netlify-cached endpoints for each content type
-- `server/api/cache/` — cache revalidation webhook handler
-- `shared/utils/` — isomorphic GROQ query constants
-- `i18n/locales/` — translation files (en active, it disabled). Active locales are defined once in `shared/utils/locales.ts`
+The base context is:
 
-### i18n
+- `.context/ARCHITECTURE.md` — technical architecture and conventions
+- `.context/TOOLS.md` — canonical resources, commands, and activation rules
+- `.context/TEAM.md` — agent roles and handoff boundaries
 
-Strategy: `prefix_except_default` — default locale (`en`) has no prefix, others use `/it/...`. Queries always receive `$lang` param. Use `NuxtLinkLocale` instead of `NuxtLink` for internal links.
+The list is intentionally extensible: load every `.context/*.md` file, including project-specific additions. No `SOUL.md` file is required; add one only when brand, editorial, or experience principles materially guide the project.
 
-### Environment Variables
+## Planning Workflow
 
-| Variable | Purpose |
-|---|---|
-| `NUXT_SANITY_PROJECT_ID` | Sanity project ID |
-| `NUXT_SANITY_TOKEN` | Sanity API token (read + visual editing) |
-| `NUXT_SANITY_VISUAL_EDITING_STUDIO_URL` | Studio URL for visual editing overlay |
-| `NUXT_SANITY_WEBHOOK_SECRET` | HMAC secret for cache revalidation webhook |
-| `NUXT_PUBLIC_SITE_URL` | Canonical site URL for sitemap/SEO (Netlify's `URL` is detected automatically) |
+The initial team contains only the non-executing Planner defined in `.context/TEAM.md`.
 
-### Styling
+- Features, refactors, architectural decisions, and durable behavior changes must be formalized as OpenSpec changes.
+- Narrow fixes and routine maintenance may use a decision-complete plan in chat when they do not change a durable capability or architectural contract.
+- When classification is uncertain, default to OpenSpec.
+- The Planner may create or update OpenSpec planning artifacts but must not implement product changes or edit owner-managed context.
 
-Tailwind v4 via `@tailwindcss/vite`. Entry point: `app/assets/css/main.css` (just `@import "tailwindcss"`). No `tailwind.config.js` — configure via CSS using `@theme`.
+Implementation begins only through an explicitly selected execution workflow after the plan or OpenSpec change is ready.
 
-### ESLint Style
+## OpenSpec Archive Retention
 
-2-space indent, single quotes, no semicolons, Stroustrup brace style (configured via `@antfu/eslint-config` in `eslint.config.mjs`).
+Keep at most the 10 most recent archived change directories under `openspec/changes/archive/`. Active changes are never counted or removed.
+
+After archiving a change:
+
+1. Confirm the archive operation synchronized its delta requirements into the durable specs under `openspec/specs/`.
+2. List archived change directories in chronological order.
+3. If there are more than 10, identify the oldest archive.
+4. Verify again that the oldest archive's requirements are represented in the durable specs.
+5. Remove that oldest archive from the working tree only after verification succeeds.
+6. Repeat until 10 archives remain.
+
+If synchronization cannot be verified, stop pruning and report the blocker. Older removed archives remain recoverable from Git history.
+
+## Project Conventions
+
+Commands and external resources are defined in `.context/TOOLS.md`. Architecture, environment variables, data flow, styling, i18n, caching, and code-style conventions are defined in `.context/ARCHITECTURE.md`.
