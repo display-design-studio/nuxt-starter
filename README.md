@@ -225,6 +225,49 @@ overwrite earlier tags.
 
 Targeted invalidation is fully covered by the Sanity webhook above — there is no manual/deploy-triggered purge endpoint.
 
+### Configure the Sanity webhook
+
+In the Sanity project management dashboard, create a webhook for the same dataset used by this
+application (`production` by default):
+
+| Setting | Value |
+|---|---|
+| URL | `https://<your-site-domain>/api/cache/revalidate` |
+| HTTP method | `POST` |
+| Trigger events | Create, update, and delete |
+| Draft events | Disabled |
+| Version events | Disabled |
+| Secret | The same private value as `NUXT_SANITY_WEBHOOK_SECRET` on the deployment |
+| Projection | The GROQ projection below |
+
+```groq
+{
+  "_id": coalesce(after()._id, before()._id),
+  "_type": coalesce(after()._type, before()._type)
+}
+```
+
+Both fields are required strings: `_id` identifies the affected document and `_type` invalidates
+collections that can include that document. The before/after fallback preserves identity on
+delete/unpublish. Do not send the entire document, tokens, or arbitrary cache tags. Leave the filter
+empty to cover every published type; if narrowing it, include all types used by pages, listings,
+and rendered references, and verify delete events are still included.
+
+Sanity adds the `sanity-webhook-signature` header automatically when a secret is configured.
+The handler verifies the signature over the raw JSON body and accepts signatures within five
+minutes. Keep the secret out of the URL, public runtime configuration, and client code.
+
+This minimal payload also remains accepted by the `refactor/cache` implementation. Its optional
+signed `operation` and `collectionChanged` fields enable more selective invalidation; configure
+those only alongside that implementation and its query-specific dependency rules. On the current
+`main` implementation, invalidation uses `_id` and `_type`.
+
+Verify setup on a non-production deployment using a published test document: create, update,
+and unpublish it, inspect the webhook attempts log, and confirm that its JSON endpoint and page
+refresh. Invalid signatures return 401 and malformed payloads return 400. Monitor failed deliveries:
+Sanity retries retryable failures only twice at 30-second intervals. See the official
+[Sanity webhook documentation](https://www.sanity.io/docs/content-lake/webhooks).
+
 ## Adding a Sanity Document Type
 
 Follow all four steps. The `scaffold-sanity-type` agent command generates the files.
