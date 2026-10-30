@@ -41,6 +41,7 @@ This checklist supersedes the original 9-task plan after the confirmed on-demand
 ### Current verification (2026-10-30)
 
 - Authorized live acceptance completed on a new isolated Netlify site and Sanity display-test. See `verification.md` for CDN, browser, Presentation-channel, webhook, failure and recovery evidence. Crawler/JSON error negotiation is fixed and covered by three additional compiled-handler scenarios (13 total). Independent final review remains task 6.2.
+- Temporary site, scoped webhook and five remaining synthetic documents removed at 11:06:19 UTC; raw-perspective verification found zero remaining documents in the test namespace.
 
 - Integrated current main, retaining AGENTS.md, current OpenSpec configuration and Codex skills; removed obsolete generated Claude/OpenCode workflow copies introduced by this branch (recoverable from its Git history).
 - Lint and synthetic Nuxt typecheck pass. All 66 unit tests pass, including one-fetch assertions, dependency invalidation and validated preview no-store.

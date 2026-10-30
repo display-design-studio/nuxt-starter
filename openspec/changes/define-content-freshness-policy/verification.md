@@ -67,4 +67,6 @@ documented limitations; a 202 is not a guarantee of atomic visibility across all
 
 ## Finalization
 
-Independent review and temporary-resource cleanup are tracked in `tasks.md`.
+At 11:06:19 UTC, the temporary Netlify site, its scoped Sanity webhook and five remaining synthetic
+documents were deleted. A raw-perspective query confirmed zero documents in the test namespace.
+No pre-existing content or deployment was removed. Independent review remains tracked in task 6.2.
