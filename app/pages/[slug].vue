@@ -25,7 +25,7 @@ if (error.value || !page.value) {
   })
 }
 
-useCacheTag([page.value._id, page.value._type])
+useCacheTag(getPageCacheTags(page.value))
 </script>
 
 <template>

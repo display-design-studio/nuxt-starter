@@ -3,6 +3,7 @@ import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 import { DEFAULT_LOCALE, LOCALES } from './shared/utils/locales'
+import { getSitemapCacheRouteRules } from './shared/utils/sitemapCache'
 
 const generatedSanityTypesUrl = new URL(
   './studio/types/sanity.types.ts',
@@ -30,6 +31,25 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   hooks: {
+    // nitro:init runs after the sitemap module has resolved locale names and its virtual config.
+    'nitro:init': (nitro) => {
+      const errorHandlers = nitro.options.errorHandler
+      nitro.options.errorHandler = [
+        fileURLToPath(new URL('./server/error-handler.ts', import.meta.url)),
+        ...(Array.isArray(errorHandlers)
+          ? errorHandlers
+          : [errorHandlers]),
+      ]
+      const sitemapConfig = nitro.options.virtual['#sitemap-virtual/static-config.mjs']
+      if (typeof sitemapConfig !== 'string')
+        throw new TypeError('Cannot resolve sitemap cache policy from the installed module')
+      for (const [route, rule] of Object.entries(getSitemapCacheRouteRules(sitemapConfig))) {
+        nitro.options.routeRules[route] = {
+          ...nitro.options.routeRules[route],
+          ...rule,
+        }
+      }
+    },
     // Visual editing overlay (React + @sanity/ui, ~780 kB) is only needed in
     // preview sessions: stop Nuxt from prefetching it for every visitor.
     'build:manifest': (manifest) => {
@@ -59,7 +79,7 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/**': {
-      isr: 86400,
+      isr: true,
       headers: {
         'cache-control': 'public, max-age=0, must-revalidate',
       },

@@ -1,4 +1,5 @@
 import { defineQuery } from 'groq'
+import { getDocumentCacheTags } from './cacheDependencies'
 
 /**
  * GROQ query to fetch the home document.
@@ -14,3 +15,8 @@ export const homeQuery = defineQuery(`*[_type == "home"][0]{
   _type,
   "title": title[$lang]
 }`)
+
+export function getHomeCacheTags(home: { _id: string }) {
+  // The [0] lookup can select a different home after a publication.
+  return getDocumentCacheTags([home], ['home'])
+}

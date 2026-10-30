@@ -1,4 +1,4 @@
-import { setResponseHeader } from 'h3'
+import { disableResponseCache } from '~~/shared/utils/responseCache'
 
 export function useNoStore() {
   if (!import.meta.server)
@@ -8,6 +8,5 @@ export function useNoStore() {
   if (!event)
     return
 
-  for (const [name, value] of Object.entries(noStoreHeaders))
-    setResponseHeader(event, name, value)
+  disableResponseCache(event)
 }

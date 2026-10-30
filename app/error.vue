@@ -7,6 +7,8 @@ defineProps<{
   }
 }>()
 
+useNoStore()
+
 const { t } = useI18n()
 const localePath = useLocalePath()
 

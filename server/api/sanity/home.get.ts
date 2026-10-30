@@ -11,15 +11,18 @@ import { createError } from 'h3'
  *
  * Cache behaviour:
  * - Browser: always revalidates
- * - Netlify durable CDN: 24 hours, with a 1-hour stale window
- * - Sanity API CDN: enabled for the published query
+ * - Netlify durable CDN: on-demand invalidation, one-year provider retention bound
+ * - Sanity origin: live published API, anonymous and without stega encoding
  *
  * Cache is invalidated via the Sanity webhook (`/api/cache/revalidate`).
  */
 export default defineEventHandler(async (event) => {
-  setNoStore(event)
+  setNoStore(event, { provisional: true })
   const locale = getSanityLocale(event)
-  const sanity = useSanity()
+  const sanity = useSanity(event).client.withConfig({
+    useCdn: false,
+    perspective: 'published',
+  })
   let result: HomeQueryResult
 
   try {
@@ -38,6 +41,6 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Not Found' })
   }
 
-  setPublicCdnCache(event, [result._id, result._type])
+  setPublicCdnCache(event, getHomeCacheTags(result))
   return result
 })

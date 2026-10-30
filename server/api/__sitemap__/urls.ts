@@ -1,5 +1,9 @@
+// The sitemap module owns periodic caching; each source execution reads live published routes.
 export default defineSitemapEventHandler(async () => {
-  const sanity = useSanity()
+  const sanity = useSanity().client.withConfig({
+    useCdn: false,
+    perspective: 'published',
+  })
   let pages: SitemapPage[]
   try {
     pages = await sanity.fetch<SitemapPage[]>(sitemapPagesQuery, {}, { stega: false })
