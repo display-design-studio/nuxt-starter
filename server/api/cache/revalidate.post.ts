@@ -3,7 +3,7 @@ import { isValidSignature } from '@sanity/webhook'
 
 /**
  * Sanity webhook handler for on-demand Netlify cache invalidation.
- * Expected body: `{ _id, _type }`.
+ * Body: `{ _id, _type, operation?, collectionChanged? }`, all covered by the signature.
  */
 export default defineEventHandler(async (event) => {
   setNoStore(event)
@@ -27,7 +27,18 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = parseRevalidateBody(rawBody)
-  await purgeCache({ tags: [body._id, body._type] })
+  const tags = getRevalidateCacheTags(body)
+  if (tags.length === 0)
+    return new Response('Ignored unpublished document', { status: 200 })
+
+  try {
+    await purgeCache({ tags })
+  }
+  catch {
+    // The SDK throws on network errors and non-2xx responses, including 429.
+    // Do not acknowledge success or expose provider errors/credentials to the caller.
+    throw createError({ statusCode: 503, statusMessage: 'Cache invalidation failed' })
+  }
 
   return new Response('Purged successfully!', { status: 202 })
 })

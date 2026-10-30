@@ -1,25 +1,22 @@
 import type { H3Event } from 'h3'
 import { setResponseHeader } from 'h3'
-import { noStoreHeaders } from '../../shared/utils/cacheHeaders'
+import { noStoreHeaders, publicContentCacheHeaders } from '../../shared/utils/cacheHeaders'
+import { addResponseCacheTags, disableResponseCache } from '../../shared/utils/responseCache'
 
-const netlifyMaxAge = 86400
-const netlifyStaleWhileRevalidate = 3600
+export function setPublicCdnCache(event: H3Event, tags: readonly string[]) {
+  if (!addResponseCacheTags(event, tags))
+    return
 
-export function setPublicCdnCache(event: H3Event, tags: string[]) {
-  const uniqueTags = [...new Set(tags.filter(Boolean))]
-
-  setResponseHeader(event, 'Cache-Control', 'public, max-age=0, must-revalidate')
-  setResponseHeader(
-    event,
-    'Netlify-CDN-Cache-Control',
-    `public, durable, max-age=${netlifyMaxAge}, stale-while-revalidate=${netlifyStaleWhileRevalidate}`,
-  )
-
-  if (uniqueTags.length > 0)
-    setResponseHeader(event, 'Netlify-Cache-Tag', uniqueTags.join(','))
+  for (const [name, value] of Object.entries(publicContentCacheHeaders))
+    setResponseHeader(event, name, value)
 }
 
-export function setNoStore(event: H3Event) {
+/** Only successful public endpoints may replace their provisional initial no-store. */
+export function setNoStore(event: H3Event, options: { provisional?: boolean } = {}) {
+  if (!options.provisional) {
+    disableResponseCache(event)
+    return
+  }
   for (const [name, value] of Object.entries(noStoreHeaders))
     setResponseHeader(event, name, value)
 }

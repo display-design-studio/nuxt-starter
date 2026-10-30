@@ -1,4 +1,4 @@
-import { setResponseHeader } from 'h3'
+import { addResponseCacheTags } from '~~/shared/utils/responseCache'
 
 export function useCacheTag(tag: string | string[]) {
   if (!import.meta.server)
@@ -8,7 +8,5 @@ export function useCacheTag(tag: string | string[]) {
   if (!event)
     return
 
-  const value = Array.isArray(tag) ? tag.join(',') : tag
-
-  setResponseHeader(event, 'Netlify-Cache-Tag', value)
+  addResponseCacheTags(event, Array.isArray(tag) ? tag : [tag])
 }

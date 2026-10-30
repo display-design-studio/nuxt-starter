@@ -1,4 +1,5 @@
 import { defineQuery } from 'groq'
+import { getDocumentCacheTags } from './cacheDependencies'
 
 /**
  * GROQ query to fetch a single page document by slug and language.
@@ -19,3 +20,7 @@ export const pageQuery
   = defineQuery(`*[_type == "page" && slug[$lang].current == $slug][0]{
   ...
 }`)
+
+export function getPageCacheTags(page: { _id: string }) {
+  return getDocumentCacheTags([page])
+}

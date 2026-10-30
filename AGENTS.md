@@ -23,17 +23,19 @@ Nuxt 4 full-stack app with Sanity CMS, deployed on Netlify with ISR (Incremental
 ### Data-Flow Pattern (add a new document type by following all 4 steps)
 
 1. **`shared/utils/<type>Query.ts`** — define the GROQ query constant (use the `groq` template tag)
-2. **`server/api/sanity/<type>.get.ts`** — `defineEventHandler` that validates query params, runs the published query, calls `setPublicCdnCache()` with the result `_id`/`_type`, and explicitly marks errors `no-store`
+2. **`server/api/sanity/<type>.get.ts`** — begin with provisional no-store, validate query params, derive a client with `useSanity(event).client.withConfig({ useCdn: false, perspective: 'published' })`, read anonymously with `stega: false`, then call `setPublicCdnCache()` with the shared query dependency selector; errors remain `no-store`
 3. **`app/composables/useSanity<Type>.ts`** — preview-aware composable: `useSanityQuery()` in preview mode, `useFetch('/api/sanity/<type>')` in production
-4. **`app/pages/*.vue`** — call the composable; throw on missing/upstream data before adding the result `_id`/`_type` as page cache tags
+4. **`app/pages/*.vue`** — call the composable; set final no-store and throw on missing/upstream data, otherwise register the same dependency selector as the JSON endpoint. Tags are cumulative per request, not overwritten
 
 ### Caching Architecture
 
 - **Browser cache**: stores responses but revalidates every request (`max-age=0, must-revalidate`)
-- **Netlify durable CDN**: 24 hours with a 1-hour stale-while-revalidate window
-- **Sanity API CDN**: anonymous published reads use `useCdn: true`
-- **On-demand invalidation**: signed Sanity webhooks purge both page and API responses by `_id`/`_type`
+- **Netlify content cache**: on-demand page ISR (`true`) and durable JSON retention of 31536000 seconds, matching the installed preset's one-year bound; no daily refresh or extra JSON stale window. Browser revalidation and normal deploy invalidation remain enabled; eviction/expiry can still cause regeneration
+- **Sanity origin**: public server handlers derive live published clients (`useCdn: false`) without mutating the shared module client; the module-wide default remains `useCdn: true`
+- **On-demand invalidation**: signed body `_id`/`_type` plus optional `operation`/`collectionChanged` select document/collection tags. Classified content-only updates purge only the document; create/delete or missing metadata also purge the collection. Draft/version events are skipped. Purge failures return retryable 503; finite provider retries require monitoring and authorized scoped recovery, not daily self-healing
 - **Preview mode**: a validated `sanity-preview-id` cookie bypasses all caching
+- **Dependencies**: `doc:<id>` for rendered documents/references; `collection:<type>` only for collection membership/order. Detail pages do not carry blanket type tags. Selectors are explicit and shared by HTML/JSON; invalid or over-500 tag sets disable caching without truncation. Final no-store wins over later helpers
+- **Sitemap**: the URL source uses a no-argument Sanity helper to avoid the legacy H3 event mismatch. Module-resolved XML/index/locale route overrides and the sitemap cache retain a finite 86400-second, request-driven policy without document-webhook invalidation; this is not a strict freshness or indexing deadline
 
 ### Key Directories
 

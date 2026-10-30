@@ -11,7 +11,7 @@ if (error.value || !home.value) {
   })
 }
 
-useCacheTag([home.value._id, home.value._type])
+useCacheTag(getHomeCacheTags(home.value))
 </script>
 
 <template>
