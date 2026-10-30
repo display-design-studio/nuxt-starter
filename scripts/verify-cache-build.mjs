@@ -90,6 +90,19 @@ try {
     console.log(`PASS preview: ${title}, draft client and no-store`)
   }
 
+  for (const headers of [
+    { accept: 'application/json' },
+    { 'user-agent': 'curl/8' },
+    { 'sec-fetch-mode': 'cors' },
+  ]) {
+    const response = await handler(new Request('https://example.test/missing', { headers }))
+    await response.text()
+    assert.equal(response.status, 404)
+    assert.equal(response.headers.get('cache-control'), 'no-store')
+    assert.equal(response.headers.get('netlify-cdn-cache-control'), 'no-store')
+    console.log('PASS negotiated JSON page error: 404 and no-store')
+  }
+
   calls = 0
   const published = await handler(new Request('https://example.test/about'))
   const publishedBody = await published.text()

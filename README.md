@@ -547,6 +547,11 @@ on a different platform, replace the endpoint with the equivalent CDN purge mech
 No other Netlify-specific configuration is required beyond setting the environment variables
 in the Netlify dashboard.
 
+Build deployment artifacts on Linux (Netlify CI or a Linux build environment). A macOS build can
+contain only the macOS `mdream` native binding and fail at function startup on Linux, even when
+local checks pass. Manual uploads must include native dependencies for the target runtime;
+Netlify CLI remote builds require the site to be connected to a Git repository.
+
 ## Local Container Development
 
 The development application can run in a Docker or Podman container while Caddy

@@ -1,10 +1,21 @@
-import { getRequestURL, send, setResponseHeaders, setResponseStatus } from 'h3'
+import { getRequestHeader, getRequestURL, send, setResponseHeaders, setResponseStatus } from 'h3'
 import { defineNitroErrorHandler } from 'nitropack/runtime'
 import { setNoStore } from './utils/cdnCache'
 
-// Keep Nuxt's HTML error renderer; finalize API errors without its 404 no-cache override.
+// Preserve Nuxt's HTML renderer while finalizing negotiated JSON errors as no-store.
 export default defineNitroErrorHandler(async (error, event, { defaultHandler }) => {
-  if (!getRequestURL(event).pathname.startsWith('/api/'))
+  const path = getRequestURL(event).pathname
+  const accept = (getRequestHeader(event, 'accept') ?? '').toLowerCase()
+  const userAgent = (getRequestHeader(event, 'user-agent') ?? '').toLowerCase()
+  // Match Nuxt's JSON error negotiation, including browser fetch and CLI requests.
+  const jsonRequest = !accept.includes('text/html') && (
+    accept.includes('application/json')
+    || userAgent.includes('curl/')
+    || userAgent.includes('httpie/')
+    || getRequestHeader(event, 'sec-fetch-mode') === 'cors'
+    || path.endsWith('.json')
+  )
+  if (!path.startsWith('/api/') && !jsonRequest)
     return
 
   const response = await defaultHandler(error, event, { json: true })
