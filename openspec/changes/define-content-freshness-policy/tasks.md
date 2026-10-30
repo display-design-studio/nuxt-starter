@@ -33,7 +33,7 @@ This checklist supersedes the original 9-task plan after the confirmed on-demand
 ## 6. Cross-path acceptance and regression checks
 
 - [x] 6.1 In the established dependency environment, run `bun run test`, `bun run lint`, `bun run typecheck`, and `bun run build` with inspected scripts and synthetic configuration. Also verify the Netlify-target build/effective adapter output for content and sitemap retention without deployment or production credentials; record actual results and leave this task incomplete if any required check is blocked.
-- [ ] 6.2 Obtain independent review of the complete revised implementation for dependency completeness, selective versus legacy purge behavior, signature/draft boundaries, shared-state mutation, sticky no-store, sitemap overrides, and recovery semantics. Verify completion by resolving relevant findings and rerunning affected checks; static review is not proof of deployed CDN behavior.
+- [x] 6.2 Obtain independent review of the complete revised implementation for dependency completeness, selective versus legacy purge behavior, signature/draft boundaries, shared-state mutation, sticky no-store, sitemap overrides, and recovery semantics. Verify completion by resolving relevant findings and rerunning affected checks; static review is not proof of deployed CDN behavior.
 - [x] 6.3 After separate authorization for a synthetic non-production project/dataset/deploy, execute the updated integration checklist: show A/home HTML and JSON invalidated while B retains its cache, draft-only edits cause no purge, new membership/order changes update listings, and unpublish/slug changes remove obsolete routes. Verify configured retention and enhanced classification, preview isolation, sitemap exceptions, and failure/recovery behavior; record safe evidence and leave this item unchecked if access/authorization is unavailable.
 
 ## Retained work and verification history
@@ -42,6 +42,7 @@ This checklist supersedes the original 9-task plan after the confirmed on-demand
 
 - Authorized live acceptance completed on a new isolated Netlify site and Sanity display-test. See `verification.md` for CDN, browser, Presentation-channel, webhook, failure and recovery evidence. Crawler/JSON error negotiation is fixed and covered by three additional compiled-handler scenarios (13 total). Independent final review remains task 6.2.
 - Temporary site, scoped webhook and five remaining synthetic documents removed at 11:06:19 UTC; raw-perspective verification found zero remaining documents in the test namespace.
+- Independent read-only review at `d8cdaa7ff6aa79739e318a7c39e0ce4470ce18d4` found no blocking issues. The reviewer independently reran all 66 tests, lint and 13 compiled-handler checks, reviewed the live/cleanup evidence and confirmed the documented residual limitations. All 16 implementation/acceptance tasks are complete.
 
 - Integrated current main, retaining AGENTS.md, current OpenSpec configuration and Codex skills; removed obsolete generated Claude/OpenCode workflow copies introduced by this branch (recoverable from its Git history).
 - Lint and synthetic Nuxt typecheck pass. All 66 unit tests pass, including one-fetch assertions, dependency invalidation and validated preview no-store.
