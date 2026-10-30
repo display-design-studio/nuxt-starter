@@ -8,5 +8,7 @@ export function useCacheTag(tag: string | string[]) {
   if (!event)
     return
 
-  addResponseCacheTags(event, Array.isArray(tag) ? tag : [tag])
+  addResponseCacheTags(event, Array.isArray(tag)
+    ? tag
+    : [tag])
 }

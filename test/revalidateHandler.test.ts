@@ -60,32 +60,48 @@ describe('signed cache revalidation handler', () => {
 
       expect(response.status).toBe(202)
       expect(purgeCache).toHaveBeenCalledTimes(1)
-      expect(purgeCache).toHaveBeenCalledWith({ tags: ['doc:page.test', 'collection:page'] })
+      expect(purgeCache).toHaveBeenCalledWith({
+        tags: ['doc:page.test', 'collection:page'],
+      })
       expect(res.getHeader('Cache-Control')).toBe('no-store')
       expect(res.getHeader('Netlify-CDN-Cache-Control')).toBe('no-store')
     })
   })
 
   test('a signed content-only update purges its document only and can be safely repeated', async () => {
-    const rawBody = JSON.stringify({ _id: 'A', _type: 'article', operation: 'update', collectionChanged: false })
+    const rawBody = JSON.stringify({
+      _id: 'A',
+      _type: 'article',
+      operation: 'update',
+      collectionChanged: false,
+    })
     const signature = await encodeSignatureHeader(rawBody, Date.now(), secret)
     await withWebhookFixture(rawBody, signature, async ({ event, purgeCache }) => {
       const { default: handler } = await import('../server/api/cache/revalidate.post')
       expect((await handler(event)).status).toBe(202)
       expect((await handler(event)).status).toBe(202)
       expect(purgeCache).toHaveBeenCalledTimes(2)
-      expect(purgeCache).toHaveBeenCalledWith({ tags: ['doc:A'] })
+      expect(purgeCache).toHaveBeenCalledWith({
+        tags: ['doc:A'],
+      })
     })
   })
 
   for (const operation of ['create', 'delete'] as const) {
     test(`a signed ${operation} always invalidates collection membership`, async () => {
-      const rawBody = JSON.stringify({ _id: 'A', _type: 'article', operation, collectionChanged: false })
+      const rawBody = JSON.stringify({
+        _id: 'A',
+        _type: 'article',
+        operation,
+        collectionChanged: false,
+      })
       const signature = await encodeSignatureHeader(rawBody, Date.now(), secret)
       await withWebhookFixture(rawBody, signature, async ({ event, purgeCache }) => {
         const { default: handler } = await import('../server/api/cache/revalidate.post')
         expect((await handler(event)).status).toBe(202)
-        expect(purgeCache).toHaveBeenCalledWith({ tags: ['doc:A', 'collection:article'] })
+        expect(purgeCache).toHaveBeenCalledWith({
+          tags: ['doc:A', 'collection:article'],
+        })
       })
     })
   }
@@ -130,8 +146,12 @@ describe('signed cache revalidation handler', () => {
       const signature = kind === 'invalid'
         ? 'invalid-signature'
         : await encodeSignatureHeader(
-            kind === 'tampered' ? '{}' : body,
-            Date.now() - (kind === 'expired' ? 6 * 60 * 1000 : 0),
+            kind === 'tampered'
+              ? '{}'
+              : body,
+            Date.now() - (kind === 'expired'
+              ? 6 * 60 * 1000
+              : 0),
             secret,
           )
 

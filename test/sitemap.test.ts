@@ -13,8 +13,17 @@ describe('locales', () => {
 describe('sitemap entries', () => {
   test('builds one entry per active locale with a slug', () => {
     const entries = buildSitemapEntries([
-      { slug: { en: { current: 'hello-world' }, it: { current: 'ciao-mondo' } } },
-      { slug: { en: { current: 'about' } } },
+      {
+        slug: {
+          en: { current: 'hello-world' },
+          it: { current: 'ciao-mondo' },
+        },
+      },
+      {
+        slug: {
+          en: { current: 'about' },
+        },
+      },
     ])
 
     expect(entries).toContainEqual({ loc: '/hello-world', _sitemap: 'en' })
@@ -23,6 +32,12 @@ describe('sitemap entries', () => {
   })
 
   test('skips pages without a usable slug', () => {
-    expect(buildSitemapEntries([{ slug: null }, { slug: { en: null } }, {}])).toEqual([])
+    expect(buildSitemapEntries([
+      { slug: null },
+      {
+        slug: { en: null },
+      },
+      {},
+    ])).toEqual([])
   })
 })

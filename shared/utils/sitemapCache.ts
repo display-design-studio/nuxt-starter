@@ -26,5 +26,8 @@ export function getSitemapCacheRouteRules(virtualConfig: string) {
       routes.add(`/${route.replace(/^\/+/, '')}`)
   }
 
-  return Object.fromEntries([...routes].map(route => [route, { isr: 86400 }]))
+  return Object.fromEntries([...routes].map(route => [
+    route,
+    { isr: 86400 },
+  ]))
 }

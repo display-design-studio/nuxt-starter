@@ -7,8 +7,16 @@ import { createTestEvent } from './helpers/nitro'
 describe('request-local response dependencies', () => {
   test('merges layout, page, footer and API registrations without replacing earlier tags', () => {
     for (const registrations of [
-      [['doc:layout'], ['doc:page', 'doc:layout'], ['doc:footer']],
-      [['doc:footer'], ['doc:page', 'doc:layout'], ['doc:layout']],
+      [
+        ['doc:layout'],
+        ['doc:page', 'doc:layout'],
+        ['doc:footer'],
+      ],
+      [
+        ['doc:footer'],
+        ['doc:page', 'doc:layout'],
+        ['doc:layout'],
+      ],
     ]) {
       const { event, res } = createTestEvent('/')
       for (const tags of registrations)
@@ -45,7 +53,12 @@ describe('request-local response dependencies', () => {
   })
 
   test('invalid new or existing tags cannot produce a partially cached response', () => {
-    for (const invalid of ['', 'page', 'doc:bad,id', `doc:${'a'.repeat(1025)}`]) {
+    for (const invalid of [
+      '',
+      'page',
+      'doc:bad,id',
+      `doc:${'a'.repeat(1025)}`,
+    ]) {
       const { event, res } = createTestEvent('/')
       addResponseCacheTags(event, ['doc:valid'])
       addResponseCacheTags(event, [invalid])

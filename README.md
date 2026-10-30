@@ -270,6 +270,21 @@ Configure POST to `/api/cache/revalidate`, the shared webhook secret, and create
 triggers. Disable draft and version events: saving a draft must not invalidate published content.
 The handler also defensively skips those document namespaces after authenticating the request.
 
+| Sanity setting | Required value |
+|---|---|
+| URL | `https://<your-site-domain>/api/cache/revalidate` |
+| HTTP method | `POST` |
+| Dataset | Same as the application (`production` by default) |
+| Events | Create, update, delete (including unpublish) |
+| Draft/version events | Disabled |
+| Secret | Same private value as deployment variable `NUXT_SANITY_WEBHOOK_SECRET` |
+| Filter | Empty, or all document types used by pages, listings and rendered references |
+| Projection | Signed JSON fields from the GROQ projection below |
+
+Sanity generates `sanity-webhook-signature` automatically from the configured secret. No token or
+secret belongs in the URL or payload. `_id` and `_type` are required; `operation` and
+`collectionChanged` are optional but enable selective collection invalidation.
+
 Use this projection for the template's current page-slug predicate; it preserves the document
 identity on delete/unpublish and conservatively classifies other document types:
 
@@ -294,6 +309,25 @@ that filters by category and sorts by publication date, its selector would need 
 as well as any slug/filter flags. A title is a collection change too if a query filters or sorts by
 title. Do not copy a content-only classification without checking every declared query dependency.
 The projection above is exercised by synthetic Delta-GROQ tests; this template does not add an article schema.
+
+The home query uses `[0]`, so its selector also registers `collection:home` to handle a newly
+published home replacing the selected result. Derived projects must enforce unique localized
+page slugs in their CMS; ambiguous slug matches cannot provide reliable detail-page selection.
+
+### Query budget
+
+Each successful origin execution of the home/page endpoint performs one GROQ fetch. Include all
+rendered references and listing items in that same query and project their IDs for dependencies.
+The SSR result is transferred in Nuxt's payload for hydration. A Netlify cache hit performs no
+Sanity query; a cache miss, expiry or purge permits a new origin execution. Client navigation can
+independently miss the JSON cache, and concurrent misses or SDK retries can cause additional reads.
+Live preview intentionally reads draft updates without public caching.
+
+`scripts/verify-cache-build.mjs` exercises the compiled Netlify handler with a synthetic Sanity
+client: it checks one query for an entire SSR response, hydration payload, HTML/JSON tags and
+retention, and final no-store headers on API/page errors. CI builds with project ID `synthetic`
+before running it. This verifies the adapter locally; actual CDN hits and webhook propagation
+still require the non-production checks below.
 
 - Signed `operation: "update"` plus `collectionChanged: false`: purge the document only.
 - Create/delete or a collection change: purge the document and its type's declared collections.

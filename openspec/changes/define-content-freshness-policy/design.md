@@ -2,6 +2,16 @@
 
 ## Context
 
+Implementation reconciliation (2026-10-30): the original context below describes the baseline,
+not the current checkout. The branch now includes the revised policy and is integrated with main.
+The home selector declares `collection:home` for its `[0]` lookup; derived CMS schemas must enforce
+unique localized page slugs. Each origin execution performs one content query, with rendered
+references/listings projected in that query. Compiled Netlify tests verify HTML/JSON headers and
+the query budget. Nitro's default API 404 handler overwrites browser no-store with no-cache;
+a first API error handler reapplies no-store after Nitro builds its error response, while
+`app/error.vue` disables caching on rendered HTML errors. Nuxt's existing HTML error renderer
+remains in the chain. Real CDN publication/preview validation remains a separate acceptance gate.
+
 See `proposal.md` for motivation and `specs/content-freshness/spec.md` for the behavior contract.
 
 The change is partially implemented. Home/page handlers now derive live published clients and disable stega per fetch; their validation, response shapes, and no-store errors remain intact. The sitemap source has the same attempted derivation, but passing its Nuxt `RequestEvent` into the installed Sanity helper causes TS2769 because that helper expects legacy `H3Event`. No type cast or compatibility fix has been applied yet.

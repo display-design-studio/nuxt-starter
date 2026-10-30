@@ -17,5 +17,6 @@ export const homeQuery = defineQuery(`*[_type == "home"][0]{
 }`)
 
 export function getHomeCacheTags(home: { _id: string }) {
-  return getDocumentCacheTags([home])
+  // The [0] lookup can select a different home after a publication.
+  return getDocumentCacheTags([home], ['home'])
 }

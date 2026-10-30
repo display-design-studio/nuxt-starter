@@ -7,10 +7,16 @@ defineProps<{
   }
 }>()
 
+useNoStore()
+
 const { t } = useI18n()
 const localePath = useLocalePath()
 
-const handleError = () => clearError({ redirect: localePath('/') })
+function handleError() {
+  return clearError({
+    redirect: localePath('/'),
+  })
+}
 </script>
 
 <template>

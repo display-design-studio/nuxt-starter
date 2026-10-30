@@ -19,8 +19,13 @@ export function addResponseCacheTags(event: H3Event, tags: readonly string[]) {
   }
 
   const previous = getResponseHeader(event, 'Netlify-Cache-Tag')
-  const existing = previous === undefined ? [] : String(previous).split(',')
-  const normalized = normalizeCacheTags([...existing, ...tags])
+  const existing = previous === undefined
+    ? []
+    : String(previous).split(',')
+  const normalized = normalizeCacheTags([
+    ...existing,
+    ...tags,
+  ])
   if (!normalized || normalized.length === 0) {
     disableResponseCache(event)
     return false

@@ -11,7 +11,10 @@ describe('sitemap retention exceptions from resolved module metadata', () => {
       sitemapName: 'sitemap.xml',
       isMultiSitemap: true,
       sitemapsPathPrefix: '/__sitemap__',
-      sitemaps: { index: { _route: '/sitemap_index.xml' }, en: { _route: '/__sitemap__/en.xml' } },
+      sitemaps: {
+        index: { _route: '/sitemap_index.xml' },
+        en: { _route: '/__sitemap__/en.xml' },
+      },
     }))
     expect(rules).toEqual({
       '/sitemap.xml': { isr: 86400 },
@@ -30,7 +33,10 @@ describe('sitemap retention exceptions from resolved module metadata', () => {
         sitemapName: 'sitemap.xml',
         isMultiSitemap: true,
         sitemapsPathPrefix: prefix,
-        sitemaps: { en: { _route: `${path}/en.xml` }, it: { _route: `${path}/it.xml` } },
+        sitemaps: {
+          en: { _route: `${path}/en.xml` },
+          it: { _route: `${path}/it.xml` },
+        },
       }))
       expect(rules[`${path}/en.xml`]).toEqual({ isr: 86400 })
       expect(rules[`${path}/it.xml`]).toEqual({ isr: 86400 })
@@ -43,8 +49,12 @@ describe('sitemap retention exceptions from resolved module metadata', () => {
     expect(getSitemapCacheRouteRules(virtualConfig({
       sitemapName: 'custom-map.xml',
       isMultiSitemap: false,
-      sitemaps: { main: { route: '/custom-map.xml' } },
-    }))).toEqual({ '/custom-map.xml': { isr: 86400 } })
+      sitemaps: {
+        main: { route: '/custom-map.xml' },
+      },
+    }))).toEqual({
+      '/custom-map.xml': { isr: 86400 },
+    })
     expect(() => getSitemapCacheRouteRules('not a static export')).toThrow()
   })
 })

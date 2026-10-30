@@ -3,12 +3,26 @@ import { isApiPath, isSanityInfrastructurePath, isStaticAssetPath } from '../ser
 
 describe('request path classification', () => {
   test('treats build output and common assets as static', () => {
-    for (const path of ['/_nuxt/entry.js', '/_nuxt/any', '/logo.webp', '/a/b.avif', '/hero.JPG'.toLowerCase(), '/font.woff2', '/favicon.ico', '/x.js.map'])
+    for (const path of [
+      '/_nuxt/entry.js',
+      '/_nuxt/any',
+      '/logo.webp',
+      '/a/b.avif',
+      '/hero.JPG'.toLowerCase(),
+      '/font.woff2',
+      '/favicon.ico',
+      '/x.js.map',
+    ])
       expect(isStaticAssetPath(path)).toBe(true)
   })
 
   test('does not treat pages as static', () => {
-    for (const path of ['/', '/hello-world', '/it/ciao-mondo', '/sitemap.xml'])
+    for (const path of [
+      '/',
+      '/hello-world',
+      '/it/ciao-mondo',
+      '/sitemap.xml',
+    ])
       expect(isStaticAssetPath(path)).toBe(false)
   })
 

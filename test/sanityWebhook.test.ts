@@ -55,7 +55,10 @@ describe('Sanity webhook validation', () => {
     ]) {
       expect(() => parseRevalidateBody(JSON.stringify({ _id: 'A', _type: 'article', ...metadata }))).toThrow()
     }
-    expect(() => parseRevalidateBody(JSON.stringify({ _id: 'A'.repeat(257), _type: 'article' }))).toThrow()
+    expect(() => parseRevalidateBody(JSON.stringify({
+      _id: 'A'.repeat(257),
+      _type: 'article',
+    }))).toThrow()
     expect(() => parseRevalidateBody(JSON.stringify({ _id: 'A', _type: 'article:bad' }))).toThrow()
   })
 

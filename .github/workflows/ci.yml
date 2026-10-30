@@ -16,8 +16,8 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: jdx/mise-action@v2
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v5
         with:
           install_args: bun node
       - run: bun install --frozen-lockfile
@@ -27,3 +27,20 @@ jobs:
       - run: bun run build
         env:
           NUXT_SANITY_PROJECT_ID: ${{ vars.NUXT_SANITY_PROJECT_ID }}
+
+  cache-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v5
+        with:
+          install_args: bun node
+      - run: bun install --frozen-lockfile
+      - run: bun run build --dotenv /dev/null
+        env:
+          NITRO_PRESET: netlify
+          NUXT_SANITY_PROJECT_ID: synthetic
+          NUXT_SANITY_TOKEN: synthetic-preview-token
+          NUXT_SANITY_VISUAL_EDITING_STUDIO_URL: https://studio.example.test
+          NUXT_PUBLIC_SITE_URL: https://example.test
+      - run: node scripts/verify-cache-build.mjs

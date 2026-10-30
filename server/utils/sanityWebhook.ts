@@ -38,8 +38,12 @@ export function parseRevalidateBody(rawBody: string): RevalidateBody {
     throw createError({ statusCode: 400, statusMessage: 'Invalid webhook payload' })
   }
 
-  const operation = 'operation' in value ? value.operation : undefined
-  const collectionChanged = 'collectionChanged' in value ? value.collectionChanged : undefined
+  const operation = 'operation' in value
+    ? value.operation
+    : undefined
+  const collectionChanged = 'collectionChanged' in value
+    ? value.collectionChanged
+    : undefined
   if (
     (operation !== undefined && !isRevalidateOperation(operation))
     || (collectionChanged !== undefined && typeof collectionChanged !== 'boolean')
@@ -50,8 +54,12 @@ export function parseRevalidateBody(rawBody: string): RevalidateBody {
   return {
     _id: value._id,
     _type: value._type,
-    ...(operation !== undefined ? { operation } : {}),
-    ...(collectionChanged !== undefined ? { collectionChanged } : {}),
+    ...(operation !== undefined
+      ? { operation }
+      : {}),
+    ...(collectionChanged !== undefined
+      ? { collectionChanged }
+      : {}),
   }
 }
 
@@ -60,7 +68,11 @@ export function getRevalidateCacheTags(body: RevalidateBody) {
     return []
 
   const contentOnly = body.operation === 'update' && body.collectionChanged === false
-  return getDocumentCacheTags([{ _id: body._id }], contentOnly ? [] : [body._type])
+  return getDocumentCacheTags([
+    { _id: body._id },
+  ], contentOnly
+    ? []
+    : [body._type])
 }
 
 export function hasFreshWebhookSignature(signature: string, now = Date.now()) {

@@ -32,11 +32,22 @@ This checklist supersedes the original 9-task plan after the confirmed on-demand
 
 ## 6. Cross-path acceptance and regression checks
 
-- [ ] 6.1 In the established dependency environment, run `bun run test`, `bun run lint`, `bun run typecheck`, and `bun run build` with inspected scripts and synthetic configuration. Also verify the Netlify-target build/effective adapter output for content and sitemap retention without deployment or production credentials; record actual results and leave this task incomplete if any required check is blocked.
+- [x] 6.1 In the established dependency environment, run `bun run test`, `bun run lint`, `bun run typecheck`, and `bun run build` with inspected scripts and synthetic configuration. Also verify the Netlify-target build/effective adapter output for content and sitemap retention without deployment or production credentials; record actual results and leave this task incomplete if any required check is blocked.
 - [ ] 6.2 Obtain independent review of the complete revised implementation for dependency completeness, selective versus legacy purge behavior, signature/draft boundaries, shared-state mutation, sticky no-store, sitemap overrides, and recovery semantics. Verify completion by resolving relevant findings and rerunning affected checks; static review is not proof of deployed CDN behavior.
 - [ ] 6.3 After separate authorization for a synthetic non-production project/dataset/deploy, execute the updated integration checklist: show A/home HTML and JSON invalidated while B retains its cache, draft-only edits cause no purge, new membership/order changes update listings, and unpublish/slug changes remove obsolete routes. Verify configured retention and enhanced classification, preview isolation, sitemap exceptions, and failure/recovery behavior; record safe evidence and leave this item unchecked if access/authorization is unavailable.
 
 ## Retained work and verification history
+
+### Current verification (2026-10-30)
+
+- Integrated current main, retaining AGENTS.md, current OpenSpec configuration and Codex skills; removed obsolete generated Claude/OpenCode workflow copies introduced by this branch (recoverable from its Git history).
+- Lint and synthetic Nuxt typecheck pass. All 66 unit tests pass, including one-fetch assertions, dependency invalidation and validated preview no-store.
+- Synthetic Node and Netlify production builds pass using main's Nuxt 4.6.3/Nitro 2.13.5 dependency environment. The Netlify adapter and generated sitemap route rules retain the expected one-year/86400-second policies. The skew-protection warning for boolean ISR remains; ordinary deploy invalidation is retained.
+- `node scripts/verify-cache-build.mjs` passes 10 checks against the compiled Netlify handler: one fetch for each full HTML/JSON response, hydration payload, tags, retention, no-store on 400/404, current draft preview and public isolation after preview. CI now repeats this synthetic build verification.
+- Fixed the actual Nitro API/page 404 browser-header override found by compiled-handler testing. Home now tags its first-document lookup collection.
+- Sanity CLI confirms project `display-test` (`xrn5spf3`) and public `production` dataset; no webhook is configured. The connected Sanity account lacks access, but the local CLI account can read project metadata. Awaiting an identified/authorized Netlify test target before external publication/deployment checks. No content or deployment has been changed.
+
+### Historical baseline (superseded by current verification above)
 
 - Dependency setup: frozen install with the hoisted linker succeeded without manifest or lockfile changes; the unmodified baseline then passed all 15 tests.
 - Before this planning revision, `bun run test` passed 32 tests and `bun run lint` passed. Those results cover the partial original implementation, not the new long-lived retention/dependency requirements; no application checks were rerun during this planning-only revision.

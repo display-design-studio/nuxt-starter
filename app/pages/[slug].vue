@@ -19,7 +19,9 @@ if (error.value || !page.value) {
 
   throw createError({
     statusCode,
-    statusMessage: statusCode === 404 ? 'Page not found' : 'Failed to load page content',
+    statusMessage: statusCode === 404
+      ? 'Page not found'
+      : 'Failed to load page content',
   })
 }
 

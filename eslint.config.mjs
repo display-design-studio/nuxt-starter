@@ -22,7 +22,13 @@ export default antfu(
   // tailwindcss
   tailwindcss.configs.recommended,
   {
-    files: ['**/*.vue', '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
+    files: [
+      '**/*.vue',
+      '**/*.ts',
+      '**/*.tsx',
+      '**/*.js',
+      '**/*.jsx',
+    ],
     settings: {
       tailwindcss: {
         cssConfigPath: 'app/assets/css/main.css',
@@ -41,7 +47,11 @@ export default antfu(
   },
   {
     files: ['shared/utils/**/*.ts'],
-    plugins: { local: { rules: { 'groq-syntax': groqSyntax } } },
+    plugins: {
+      local: {
+        rules: { 'groq-syntax': groqSyntax },
+      },
+    },
     rules: {
       'local/groq-syntax': 'error',
       'sanity/groq-unknown-field': 'warn',

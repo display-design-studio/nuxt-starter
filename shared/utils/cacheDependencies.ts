@@ -16,11 +16,15 @@ export function isDraftDocumentId(id: string) {
 
 /** Invalid input is retained as an invalid tag so callers can disable caching, not truncate it. */
 export function documentCacheTag(id: unknown) {
-  return isSanityDocumentId(id) && !isDraftDocumentId(id) ? `doc:${id}` : ''
+  return isSanityDocumentId(id) && !isDraftDocumentId(id)
+    ? `doc:${id}`
+    : ''
 }
 
 export function collectionCacheTag(type: unknown) {
-  return isSanityDocumentType(type) ? `collection:${type}` : ''
+  return isSanityDocumentType(type)
+    ? `collection:${type}`
+    : ''
 }
 
 export function getDocumentCacheTags(documents: readonly CacheDocument[], collections: readonly string[] = []) {
@@ -32,7 +36,9 @@ export function getDocumentCacheTags(documents: readonly CacheDocument[], collec
 
 /** Null means unsafe/incomplete dependencies: never cache a truncated tag set. */
 export function normalizeCacheTags(tags: readonly string[]): string[] | null {
-  const unique = [...new Set(tags)]
+  const unique = [
+    ...new Set(tags),
+  ]
   if (unique.length > maxCacheTags)
     return null
 

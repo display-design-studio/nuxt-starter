@@ -93,6 +93,7 @@ describe('published Sanity origin reads', () => {
       expect(fixture.useSanity).toHaveBeenCalledWith(event)
       expect(fixture.withConfig).toHaveBeenCalledWith({ useCdn: false, perspective: 'published' })
       expect(fixture.fetchLive).toHaveBeenCalledWith(endpoint.query, endpoint.params, { stega: false })
+      expect(fixture.fetchLive).toHaveBeenCalledTimes(1)
       expect(fixture.fetchCdn).not.toHaveBeenCalled()
       expect(fixture.derivedClients[0]?.config().useCdn).toBe(false)
       expect(fixture.derivedClients[0]?.config().perspective).toBe('published')
@@ -102,9 +103,13 @@ describe('published Sanity origin reads', () => {
       expect(res.getHeader('Netlify-CDN-Cache-Control')).toBe(
         'public, durable, max-age=31536000, must-revalidate',
       )
-      const pageTags = endpoint.name === 'home' ? getHomeCacheTags(result) : getPageCacheTags(result)
+      const pageTags = endpoint.name === 'home'
+        ? getHomeCacheTags(result)
+        : getPageCacheTags(result)
       expect(res.getHeader('Netlify-Cache-Tag')).toBe(pageTags.join(','))
-      expect(pageTags).toEqual([`doc:${result._id}`])
+      expect(pageTags).toEqual(endpoint.name === 'home'
+        ? [`doc:${result._id}`, 'collection:home']
+        : [`doc:${result._id}`])
     })
 
     test(`${endpoint.name} rejects invalid parameters before reading Sanity`, async () => {
@@ -114,7 +119,12 @@ describe('published Sanity origin reads', () => {
         'lang=en&lang=it&slug=about',
         'lang=&slug=about',
         ...(endpoint.name === 'page'
-          ? ['lang=en', 'lang=en&slug=', 'slug=nested%2Fpage', 'slug=about&slug=other']
+          ? [
+              'lang=en',
+              'lang=en&slug=',
+              'slug=nested%2Fpage',
+              'slug=about&slug=other',
+            ]
           : []),
       ]
 
@@ -180,16 +190,29 @@ describe('published Sanity origin reads', () => {
 
   test('the sitemap source returns live localized slugs without mutating the module client', async () => {
     const fixture = createSanityFixture([
-      { slug: { en: { current: 'live-slug' }, it: { current: 'slug-it' } } },
+      {
+        slug: {
+          en: { current: 'live-slug' },
+          it: { current: 'slug-it' },
+        },
+      },
       { slug: null },
     ])
-    fixture.fetchCdn.mockResolvedValue([{ slug: { en: { current: 'stale-slug' } } }])
+    fixture.fetchCdn.mockResolvedValue([
+      {
+        slug: {
+          en: { current: 'stale-slug' },
+        },
+      },
+    ])
     const { event, req, res } = createTestEvent('/api/__sitemap__/urls')
     req.headers.cookie = 'sanity-preview-id=untrusted-preview'
 
     await withTestGlobals(fixture.bindings, async () => {
       const { default: handler } = await import('../server/api/__sitemap__/urls')
-      expect(await handler(event)).toEqual([{ loc: '/live-slug', _sitemap: 'en' }])
+      expect(await handler(event)).toEqual([
+        { loc: '/live-slug', _sitemap: 'en' },
+      ])
     })
 
     expect(fixture.useSanity).toHaveBeenCalledWith()
