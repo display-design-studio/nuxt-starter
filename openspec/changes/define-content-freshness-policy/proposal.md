@@ -33,4 +33,4 @@ None.
 - External integration: signed webhook fields are extended compatibly; precise collection invalidation requires a projection aligned with each query's filter/sort dependencies. No document schema change or real blog schema/page is introduced.
 - Operational trade-off: fewer routine origin reads, but missed invalidations can retain stale data much longer. Provider retention is bounded and regeneration is not globally atomic.
 - No new dependencies, credentials, persistent cache store, generic CMS framework, manual purge endpoint, or additional deployment-provider support.
-- This revision updates planning artifacts only. The existing partial implementation remains unchanged and must be reconciled by a subsequent explicit apply request.
+- Implementation and acceptance are complete through the explicitly authorized apply workflow; `verification.md` records local, CI, live CDN and independent review evidence.

@@ -40,16 +40,16 @@ This checklist supersedes the original 9-task plan after the confirmed on-demand
 
 ### Current verification (2026-10-30)
 
-- Authorized live acceptance completed on a new isolated Netlify site and Sanity display-test. See `verification.md` for CDN, browser, Presentation-channel, webhook, failure and recovery evidence. Crawler/JSON error negotiation is fixed and covered by three additional compiled-handler scenarios (13 total). Independent final review remains task 6.2.
+- Authorized live acceptance completed on a new isolated Netlify site and Sanity display-test. See `verification.md` for CDN, browser, Presentation-channel, webhook, failure and recovery evidence. Crawler/JSON error negotiation is fixed and covered by three additional compiled-handler scenarios (13 total). Independent review is recorded below.
 - Temporary site, scoped webhook and five remaining synthetic documents removed at 11:06:19 UTC; raw-perspective verification found zero remaining documents in the test namespace.
 - Independent read-only review at `d8cdaa7ff6aa79739e318a7c39e0ce4470ce18d4` found no blocking issues. The reviewer independently reran all 66 tests, lint and 13 compiled-handler checks, reviewed the live/cleanup evidence and confirmed the documented residual limitations. All 16 implementation/acceptance tasks are complete.
 
 - Integrated current main, retaining AGENTS.md, current OpenSpec configuration and Codex skills; removed obsolete generated Claude/OpenCode workflow copies introduced by this branch (recoverable from its Git history).
 - Lint and synthetic Nuxt typecheck pass. All 66 unit tests pass, including one-fetch assertions, dependency invalidation and validated preview no-store.
 - Synthetic Node and Netlify production builds pass using main's Nuxt 4.6.3/Nitro 2.13.5 dependency environment. The Netlify adapter and generated sitemap route rules retain the expected one-year/86400-second policies. The skew-protection warning for boolean ISR remains; ordinary deploy invalidation is retained.
-- `node scripts/verify-cache-build.mjs` passes 10 checks against the compiled Netlify handler: one fetch for each full HTML/JSON response, hydration payload, tags, retention, no-store on 400/404, current draft preview and public isolation after preview. CI now repeats this synthetic build verification.
+- `node scripts/verify-cache-build.mjs` passes 13 checks against the compiled Netlify handler: one fetch for each full HTML/JSON response, hydration payload, tags, retention, no-store on 400/404 including negotiated JSON errors, current draft preview and public isolation after preview. CI repeats this synthetic build verification.
 - Fixed the actual Nitro API/page 404 browser-header override found by compiled-handler testing. Home now tags its first-document lookup collection.
-- Sanity CLI confirms project `display-test` (`xrn5spf3`) and public `production` dataset; no webhook is configured. The connected Sanity account lacks access, but the local CLI account can read project metadata. Awaiting an identified/authorized Netlify test target before external publication/deployment checks. No content or deployment has been changed.
+- The authorized live run used Sanity CLI access to project `display-test` (`xrn5spf3`), public `production` dataset and a new disposable Netlify site. All test resources were removed after acceptance; no pre-existing content or deployment was changed.
 
 ### Historical baseline (superseded by current verification above)
 
