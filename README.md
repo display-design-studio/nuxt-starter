@@ -44,6 +44,7 @@ bun run dev             # http://localhost:3000
 | `NUXT_SANITY_TOKEN` | Yes | Private server token used only for visual editing and draft reads; public endpoint reads remain anonymous |
 | `NUXT_SANITY_VISUAL_EDITING_STUDIO_URL` | Yes | Sanity Studio URL for visual editing overlay |
 | `NUXT_SANITY_WEBHOOK_SECRET` | Yes (production) | Shared secret for `POST /api/cache/revalidate` (Sanity webhook) |
+| `NUXT_CACHE_PROVIDER` | No (build time) | Cache provider adapter; defaults to `netlify`, the only provider implemented. Unknown values and a conflicting `NITRO_PRESET` fail the build. When set explicitly it also sets the Nitro preset; when unset, Nitro's own preset detection is unchanged (for example the Docker `node-server` build) |
 | `NUXT_PUBLIC_SITE_URL` | Yes (production, outside Netlify) | Canonical site URL used by sitemap and SEO tags (Netlify's `URL` is detected automatically) |
 
 ### Scripts
@@ -182,6 +183,15 @@ Unchanged content is not regenerated merely because a day has elapsed. The insta
 authorized recovery purge can cause a new live-origin read. Cache entries are not preserved across
 code deployments. Browser revalidation remains necessary because a CDN purge cannot remotely clear
 an independently fresh browser cache or update an already open Nuxt payload.
+
+### Cache provider adapter
+
+Provider-specific cache behavior (tag header name, public and no-store headers, preview vary header,
+and the tag purge) sits behind `shared/cache/` (isomorphic headers) and `server/cache/` (purge). Tags,
+normalization, no-store stickiness, preview detection and webhook classification are provider-neutral.
+Only `netlify` is implemented; Vercel and Cloudflare are tracked as issues. To add a provider, add its
+adapter and purge module, register it in `shared/cache/selection.ts` and `shared/cache/provider.ts`, and
+extend `verify-cache-build.mjs` and CI.
 
 ### `routeRules` (`nuxt.config.ts`)
 

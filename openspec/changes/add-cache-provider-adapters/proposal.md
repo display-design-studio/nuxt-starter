@@ -7,8 +7,8 @@ The caching contract (document/collection dependency tags, long-lived on-demand 
 ## What Changes
 
 - Introduce a cache-provider adapter boundary. The provider-neutral core keeps: dependency tag builders and normalization, sticky no-store, request-local tag accumulation, webhook parsing/classification, preview-session detection, and query-parameter policy. Adapters own: Nitro preset and route rules, public/no-store response headers, tag and vary header names, cookie/query vary, and tag purge.
-- Select the provider at build time with `NUXT_CACHE_PROVIDER` (`netlify` default, `vercel`). The selection sets the Nitro preset and loads the matching adapter; an unknown value, or a preset that contradicts the provider, fails the build.
-- Ship adapters for Netlify (behavior-preserving) and Vercel. Cloudflare Workers is deferred to issue #48; the boundary is designed so it can be added later.
+- Select the provider at build time with `NUXT_CACHE_PROVIDER` (`netlify` default; other providers are added with their adapters). The selection sets the Nitro preset and loads the matching adapter; an unknown value, or a preset that contradicts the provider, fails the build.
+- Ship the Netlify adapter (behavior-preserving). Vercel (#50) and Cloudflare Workers (#48) are deferred; the boundary is designed so they can be added later.
 - Let each adapter declare which contract guarantees it can meet (tag purge, durable shared retention, query-key restriction, on-demand page retention). A guarantee the provider cannot meet is reported by the build/verification step, never silently weakened.
 - Parametrize the synthetic compiled-build harness and CI by provider; document per-provider setup, credentials, and a gated real-CDN checklist.
 
@@ -31,7 +31,7 @@ The caching contract (document/collection dependency tags, long-lived on-demand 
 
 ## Exclusions
 
-- Cloudflare (deferred, tracked in #48) and other providers beyond Netlify and Vercel, and generic Node/Docker/static targets (the adapter interface is the extension point).
+- Vercel (deferred, #50), Cloudflare (deferred, #48), other providers, and generic Node/Docker/static targets (the adapter interface is the extension point).
 - A persistent application cache store, a manual purge endpoint, or any change to the Sanity data flow, query shapes, tag vocabulary, or webhook payload.
 - Real deployments or real purges; these need separate authorization for a non-production target.
 - Guaranteeing identical CDN semantics across providers: the contract is identical, the guarantees an adapter can honor are declared.

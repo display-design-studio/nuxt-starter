@@ -1,6 +1,6 @@
 # Design
 
-> Scope update (2026-11-26): Cloudflare is deferred to issue #48. The Cloudflare facts below are kept as research for that issue; decisions 3 and the Cloudflare tasks are not part of this change.
+> Scope update (2026-11-26): Vercel (#50) and Cloudflare (#48) are deferred. The provider facts below and decisions 3 and 3b are kept as research for those issues; this change delivers the adapter boundary, the Netlify adapter and build-time selection.
 
 ## Context
 
@@ -26,7 +26,14 @@ Cloudflare Workers Caching facts (Cloudflare docs under `/workers/cache/`, read 
 - Preset and config: `cloudflare_module` with `deployConfig` and `nodeCompat`, `compatibilityDate` 2025-07-17 or later (Nuxt on Workers guide). `isr` route rules do not apply on Workers. Secrets use `wrangler secret put` and `.dev.vars` locally and are read through `useRuntimeConfig(event)` inside handlers.
 - The Cloudflare Pages Nuxt + Sanity tutorial is not relevant: it targets Nuxt 2, has no caching or preview, and refreshes by redeploying through a deploy hook. The 2024 Nitro ISR proof of concept on KV is time-based only with no on-demand invalidation.
 
-Still unverified: Workers Caching status (beta/GA) and plan availability; numeric body-size limit (Free-plan limit at launch, stated as temporary), maximum TTL, and purge rate numbers; `Surrogate-Control` handling; Vercel's CDN header, tag header, purge API and credentials.
+Vercel facts (Vercel docs and the Nitro 2 Vercel provider page, read 2026-11-26):
+- Headers: `Vercel-CDN-Cache-Control` has top priority and is consumed by Vercel; then `CDN-Cache-Control`; then `Cache-Control`, which is what the browser sees (Vercel strips `s-maxage` and `stale-while-revalidate` from it). The docs recommend `Cache-Control: max-age=0, s-maxage=...` for content identical for all visitors, and an explicit `Cache-Control: max-age=0, must-revalidate` plus `Vercel-CDN-Cache-Control: s-maxage=...` combination follows from the precedence rules but is not shown (inference). `proxy-revalidate` is not supported. SSR responses from Functions can be cached through headers. Maximum cacheable response 10MB and maximum lifetime one year; times are best-effort and regional eviction can cause misses.
+- Tags: `Vercel-Cache-Tag` response header, comma-separated, case-sensitive, no commas inside a tag. Limits: 128 tags per cached response and 256 UTF-8 bytes per tag (the neutral core allows 500 tags and ids up to 256 characters, so it exceeds both). `addCacheTag()` from `@vercel/functions` is the alternative, and the docs say functions using ISR cannot access raw response headers and should use it.
+- Purge: `invalidateByTag(tag | tags)` from `@vercel/functions` marks entries stale (the next request serves stale content while revalidating in the background); `dangerouslyDeleteByTag(tag, { revalidationDeadlineSeconds })` deletes (the next request waits for the origin; stampede risk). REST: `POST https://api.vercel.com/v1/edge-cache/invalidate-by-tags` with a bearer token, `projectIdOrName` and `teamId`/`slug`, body `{ tags, target }`, 16 tags per call; the delete endpoint path was not confirmed. A tag purge also clears the Runtime Cache and Data Cache. Available on all plans. Rate limits per second averaged over 30 seconds: 50 Hobby per team, 200 Pro per team, 500 Enterprise per project; over the limit the call is rejected.
+- Cache key: method, URL, host, deployment URL and scheme; "cache keys are not configurable". Whether the query string is part of a function response key is not stated. A response whose `Vary` names `Cookie` is not cached; how a request carrying a cookie is treated when `Vary` does not name it is not stated.
+- Nitro 2: preset `vercel`; the `isr` route rule is preferred over `swr` ("`isr: true`" never expires; options `expiration`, `allowQuery` where an empty array ignores query values, `passQuery`, `exposeErrBody`, `group`). Do not combine `isr` with `prerender` on a route. On-demand revalidation uses `vercel.config.bypassToken` and a request header `x-prerender-revalidate`. The docs do not say whether `isr` changes response headers or whether handler-set headers survive, nor how `runtimeConfig` or secrets are read on Vercel.
+
+Still unverified: for Vercel, which credential `@vercel/functions` purge calls use (OIDC is unverified), the exact delete-by-tag REST path, purge propagation time, whether handler-set `Vercel-Cache-Tag` and cache headers survive the Nitro `isr` rule, how the query string and the preview cookie affect the cache, and feature status (beta/GA); for Cloudflare, Workers Caching status and plan availability, numeric body-size limit (Free-plan limit at launch, stated as temporary), maximum TTL and purge rate numbers, `Surrogate-Control` handling.
 
 ## Goals / Non-Goals
 
@@ -68,6 +75,10 @@ Netlify and Vercel have ISR; Cloudflare Workers does not (deferred, #48). Rather
 
 Cloudflare needs a different structure (Workers Caching, a gateway entrypoint for preview isolation and cache-key normalization, and per-adapter page retention route rules because Cloudflare has no Nitro `isr`). It is tracked in issue #48 with the research in Context. This change keeps the adapter boundary free of Netlify names so the provider can be added later, and does not move route rules into the adapter yet: only the page retention and sitemap periodic rules are provider-specific, and they differ only for Cloudflare.
 
+### 3b. Vercel is deferred
+
+Vercel needs per-provider tag limits (128 tags and 256 bytes per tag against the core's 500), an owner choice between hard delete and `invalidateByTag`, and a spike on handler headers under the Nitro `isr` rule, preview-cookie isolation and the query-string cache key. All of it is tracked in issue #50 with the findings recorded in Context.
+
 ### 4. Selection is build-time and strict
 
 `NUXT_CACHE_PROVIDER` defaults to `netlify`. It sets `nitro.preset` unless `NITRO_PRESET` is set, in which case a contradiction throws. Unknown values throw. Auto-detection was considered and rejected by the owner.
@@ -79,10 +90,11 @@ Cloudflare needs a different structure (Workers Caching, a gateway entrypoint fo
 ## Risks / Trade-offs
 
 - A Worker-error `stale-if-error` default serves stale indefinitely unless `must-revalidate` is present; the contract already sends it.
-- Two providers double the verification surface: mitigated by one parametrized harness and by keeping real-CDN checks as a gated checklist.
+- More providers multiply the verification surface: mitigated by one parametrized harness and by keeping real-CDN checks as a gated checklist (when providers are added).
 - Header names and purge APIs may change: confined to one adapter file per provider.
 
 ## Owner Decisions
 
+- Vercel purge semantics (open, tracked in #50): hard delete (proposed) or `invalidateByTag`.
 - Nitro major (decided 2026-11-26): stay on Nitro 2 (`nitropack`) because Nitro 3 is still a release candidate (`^3.0.261103-rc`). The adapters target Nitro 2 and keep provider code free of v2-only APIs where practical. Migrating the starter to Nitro 3 is a separate OpenSpec change to open once Nitro 3 is stable, and is not part of this change.
-- Providers: Netlify and Vercel now; Cloudflare deferred to issue #48 (owner decision, 2026-11-26). Selection by build-time `NUXT_CACHE_PROVIDER`.
+- Providers: Netlify now; Vercel (#50) and Cloudflare (#48) deferred (owner decision, 2026-11-26). Selection by build-time `NUXT_CACHE_PROVIDER`.
