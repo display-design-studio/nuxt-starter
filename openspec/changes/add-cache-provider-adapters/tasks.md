@@ -4,15 +4,15 @@ Implementation requires a separate explicit apply request. Deploying, publishing
 
 ## 1. Provider facts
 
-- [ ] 1.1 Cloudflare is confirmed in `design.md` Context except the items listed as still unverified there. Confirm from official documentation, for Vercel (and the remaining Cloudflare items): CDN cache header, tag header, tag-purge API, required credentials, query/cookie vary support, and whether SSR responses are edge-cached. Record sources and unresolved items in `design.md`. Verify each Unverified fact in Context is either confirmed with a source or listed as an open risk.
+- [ ] 1.1 Confirm from official documentation, for Vercel: CDN cache header, tag header, tag-purge API, required credentials, query/cookie vary support, and whether SSR responses are edge-cached. Record sources and unresolved items in `design.md`. Verify each Vercel fact is either confirmed with a source or listed as an open risk. Cloudflare research stays in `design.md` Context for issue #48.
 
-- [ ] 1.2 On Nitro 2 (decided), confirm each provider's preset name, how `cloudflare:workers` imports resolve in the build, and how route rules and the `nitro:init` hook behave. Verify by a successful build for each provider preset on that Nitro major.
+- [ ] 1.2 On Nitro 2 (decided), confirm each provider's preset name, and how route rules and the `nitro:init` hook behave. Verify by a successful build for each provider preset on that Nitro major.
 
 ## 2. Adapter boundary (Netlify only, no behavior change)
 
 - [x] 2.1 Extract the adapter interface and a Netlify adapter from `cacheHeaders.ts`, `responseCache.ts`, `cdnCache.ts`, the preview middleware, and `revalidate.post.ts`. Done as an isomorphic header adapter (`shared/cache/`) plus a server-only purge (`server/cache/purge.ts`), because shared code also runs in the client bundle and must not import provider SDKs. The build-time resolution (virtual module or alias) moves to 2.2 together with `NUXT_CACHE_PROVIDER`; until then `shared/cache/provider.ts` is the single selection point. Verify `bun test`, typecheck without Sanity env, and `verify-cache-build.mjs` pass unchanged and the built Netlify headers equal those of `main`.
-- [x] 2.2 Add `NUXT_CACHE_PROVIDER` selection setting the preset, with unknown-value and preset-conflict failures. Done with a build-time constant (`__CACHE_PROVIDER__` through Vite `define` and Nitro `replace`, default `netlify`) instead of an alias, which bun tests cannot resolve. The preset is set only for an explicit provider, so the Docker `node-server` build and Netlify's own detection are unchanged. Only implemented providers are accepted; Vercel and Cloudflare are added with tasks 3 and 4. Verify tests for default, each supported value, unknown value, and conflict.
-- [ ] 2.3 Move page and sitemap route rules into the adapter. Verify the Netlify route rules are byte-identical to `main`.
+- [x] 2.2 Add `NUXT_CACHE_PROVIDER` selection setting the preset, with unknown-value and preset-conflict failures. Done with a build-time constant (`__CACHE_PROVIDER__` through Vite `define` and Nitro `replace`, default `netlify`) instead of an alias, which bun tests cannot resolve. The preset is set only for an explicit provider, so the Docker `node-server` build and Netlify's own detection are unchanged. Only implemented providers are accepted; Vercel is added with task 3; Cloudflare with issue #48. Verify tests for default, each supported value, unknown value, and conflict.
+- [ ] 2.3 Deferred to issue #48: moving the page retention and sitemap periodic route rules into the adapter only matters for a provider without Nitro `isr` (Cloudflare). Netlify and Vercel keep the rules in `nuxt.config.ts`.
 
 ## 3. Vercel adapter
 
@@ -20,8 +20,7 @@ Implementation requires a separate explicit apply request. Deploying, publishing
 
 ## 4. Cloudflare adapter
 
-- [ ] 4.1 Spike on a non-production Worker: (a) confirm `cloudflare-cdn-cache-control: max-age=31536000, must-revalidate` with browser `Cache-Control: max-age=0, must-revalidate` yields an edge HIT and a revalidating browser; (b) confirm `ctx.cache.purge({ tags })` removes the entry globally; (c) determine whether Nitro `cloudflare_module` can host an uncached gateway entrypoint that handles the preview cookie and `cf.cacheKey` normalization; (d) record status, plan availability and limits. Verify with recorded `cf-cache-status` and header evidence, not assumption, and decide the adapter's declared capabilities.
-- [ ] 4.2 Implement the Cloudflare adapter per 4.1 (preset `cloudflare_module`, `cache.enabled` wrangler config, gateway entrypoint for preview and key normalization, `_headers` overlap handling, secrets via `useRuntimeConfig(event)` inside handlers; in-Worker purge needs no zone credentials). Verify the stubbed contract tests and that unsupported capabilities are reported, not asserted.
+Moved to issue #48 (deferred by the owner on 2026-11-26).
 
 ## 5. Verification, CI, documentation
 
