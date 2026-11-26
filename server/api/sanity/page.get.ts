@@ -12,6 +12,7 @@ import { createError } from 'h3'
  *
  * Cache behaviour:
  * - Browser: always revalidates
+ * - Cache key: only the declared query parameters (other parameters such as `utm_*` are ignored)
  * - Netlify durable CDN: on-demand invalidation, one-year provider retention bound
  * - Sanity origin: live published API, anonymous and without stega encoding
  *
@@ -43,6 +44,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Not Found' })
   }
 
-  setPublicCdnCache(event, getPageCacheTags(result))
+  setPublicCdnCache(event, getPageCacheTags(result), {
+    queryParams: ['lang', 'slug'],
+  })
   return result
 })
