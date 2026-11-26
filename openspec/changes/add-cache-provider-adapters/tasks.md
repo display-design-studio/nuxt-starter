@@ -4,7 +4,7 @@ Implementation requires a separate explicit apply request. Deploying, publishing
 
 ## 1. Provider facts
 
-- [ ] 1.1 Confirm from official documentation, for Vercel and Cloudflare: CDN cache header, tag header, tag-purge API, required credentials, query/cookie vary support, and whether SSR responses are edge-cached. Record sources and unresolved items in `design.md`. Verify each Unverified fact in Context is either confirmed with a source or listed as an open risk.
+- [ ] 1.1 Cloudflare is confirmed in `design.md` Context except the items listed as still unverified there. Confirm from official documentation, for Vercel (and the remaining Cloudflare items): CDN cache header, tag header, tag-purge API, required credentials, query/cookie vary support, and whether SSR responses are edge-cached. Record sources and unresolved items in `design.md`. Verify each Unverified fact in Context is either confirmed with a source or listed as an open risk.
 
 ## 2. Adapter boundary (Netlify only, no behavior change)
 
@@ -18,8 +18,8 @@ Implementation requires a separate explicit apply request. Deploying, publishing
 
 ## 4. Cloudflare adapter
 
-- [ ] 4.1 Spike: determine, on a non-production Worker, whether header-based caching plus tag purge retains Worker-rendered pages on demand; record the result and decide the adapter's declared capabilities. Verify with recorded request/response evidence, not assumption.
-- [ ] 4.2 Implement the Cloudflare adapter per 4.1 (preset `cloudflare_module`, `_headers` overlap handling, secrets via `useRuntimeConfig(event)` inside handlers, purge credentials). Verify the stubbed contract tests and that unsupported capabilities are reported, not asserted.
+- [ ] 4.1 Spike on a non-production Worker: (a) confirm `cloudflare-cdn-cache-control: max-age=31536000, must-revalidate` with browser `Cache-Control: max-age=0, must-revalidate` yields an edge HIT and a revalidating browser; (b) confirm `ctx.cache.purge({ tags })` removes the entry globally; (c) determine whether Nitro `cloudflare_module` can host an uncached gateway entrypoint that handles the preview cookie and `cf.cacheKey` normalization; (d) record status, plan availability and limits. Verify with recorded `cf-cache-status` and header evidence, not assumption, and decide the adapter's declared capabilities.
+- [ ] 4.2 Implement the Cloudflare adapter per 4.1 (preset `cloudflare_module`, `cache.enabled` wrangler config, gateway entrypoint for preview and key normalization, `_headers` overlap handling, secrets via `useRuntimeConfig(event)` inside handlers; in-Worker purge needs no zone credentials). Verify the stubbed contract tests and that unsupported capabilities are reported, not asserted.
 
 ## 5. Verification, CI, documentation
 
