@@ -12,6 +12,8 @@ Provider facts from the Cloudflare Nuxt migration guide (page modified 2026-11-1
 - Env vars are read through `useRuntimeConfig(event)` inside handlers (not module scope); secrets use `wrangler secret put` and a gitignored `.dev.vars` locally.
 - The guide does NOT cover `CDN-Cache-Control`, `Cache-Tag`, or purge APIs.
 
+Nitro major (repository fact, checked 2026-11-26): Nuxt 4.7 supports both Nitro 2 and Nitro 3. It selects the major from the installed packages (`_nitroMajor`, defaulting to 2) and uses `@nuxt/nitro-v3-server` when `nitro` v3 (peer `^3.0.261103-rc`, a release candidate) is installed. This repository has `nitropack` 2.14.0 and no `nitro` package, so it currently builds with Nitro 2. Project code that depends on v2 APIs: `server/error-handler.ts` imports `nitropack/runtime`, and `nuxt.config.ts` uses the `nitro:init` hook and `nitro.options`. The Cloudflare guides read so far do not state a Nitro version and name the preset differently (`cloudflare_module` in the Nuxt on Workers migration guide, `preset: cloudflare` in the Workers Nuxt guide); their binding access shown is `event.context.cloudflare.env`. The adapter's preset names, `cloudflare:workers` import, and route-rule behavior must therefore be confirmed for the Nitro major the project actually uses.
+
 Cloudflare Workers Caching facts (Cloudflare docs under `/workers/cache/`, read 2026-11-26; the Worker's own `fetch()` responses are cached in front of the Worker):
 - Enabled with `cache.enabled = true` in wrangler config (Wrangler 4.69.0+); `cross_version_cache` (4.107.0+) shares entries across Worker versions, otherwise each deployment starts cold. The cache belongs to the Worker, not the domain, and works on `workers.dev`, routes and custom domains. Zone Cache Rules and zone-level purges do not affect it.
 - Header precedence: `cloudflare-cdn-cache-control` (consumed and stripped), then `cdn-cache-control`, then `Cache-Control`. The docs state that edge and browser lifetimes can differ by using `cloudflare-cdn-cache-control` for the edge and `Cache-Control` for browsers. `s-maxage`, `must-revalidate` and `proxy-revalidate` forbid serving stale and disable `stale-if-error`. A worked example of `max-age=0, must-revalidate` for browsers with a one-year edge lifetime is not in the docs (our reading of the precedence rules, unverified).
@@ -85,4 +87,6 @@ Whether Nitro's `cloudflare_module` output can expose the second entrypoint (cus
 
 ## Open Decisions (owner)
 
-None blocking the proposal. Per-provider purge credential names are proposed in tasks and confirmed when the adapter is implemented.
+- Nitro major: implement the adapters on the Nitro 2 the starter uses today, or migrate the starter to Nitro 3 first as a separate OpenSpec change. Proposed default: Nitro 2 here, with adapter code kept free of v2-only APIs where practical, and the migration tracked separately because it affects the whole starter, not only caching.
+
+Otherwise none blocking the proposal. Per-provider purge credential names are proposed in tasks and confirmed when the adapter is implemented.
