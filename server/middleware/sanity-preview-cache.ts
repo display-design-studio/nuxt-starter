@@ -1,4 +1,5 @@
 import { getRequestURL, parseCookies, setResponseHeader } from 'h3'
+import { cacheProvider } from '../../shared/cache/provider'
 
 /**
  * Server middleware that disables caching for Sanity preview sessions.
@@ -16,7 +17,8 @@ export default defineEventHandler((event) => {
   const path = getRequestURL(event).pathname
 
   if (!isApiPath(path) && !isStaticAssetPath(path)) {
-    setResponseHeader(event, 'Netlify-Vary', 'cookie=sanity-preview-id')
+    for (const [name, value] of Object.entries(cacheProvider.previewVaryHeaders('sanity-preview-id')))
+      setResponseHeader(event, name, value)
   }
 
   const config = useRuntimeConfig(event)
