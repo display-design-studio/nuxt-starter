@@ -44,12 +44,14 @@ interface CacheProviderAdapter {
   id: 'netlify' | 'vercel' | 'cloudflare'
   nitroPreset: string
   capabilities: { tagPurge: boolean, durableSharedRetention: boolean, queryKeyRestriction: boolean, onDemandPageRetention: boolean }
-  pageRouteRules(): Record<string, unknown>           // replaces the hard-coded isr rules
-  publicHeaders(input: { queryParams?: readonly string[] }): Record<string, string>
+  // replaces the hard-coded isr rules
+  pageRouteRules: () => Record<string, unknown>
+  publicHeaders: (input: { queryParams?: readonly string[] }) => Record<string, string>
   tagHeaderName: string
   noStoreHeaders: Record<string, string>
-  previewVaryHeader(cookie: string): Record<string, string>
-  purgeByTags(tags: readonly string[]): Promise<void> // throws on any failure
+  previewVaryHeader: (cookie: string) => Record<string, string>
+  // throws on any failure
+  purgeByTags: (tags: readonly string[]) => Promise<void>
   requiredEnv: readonly string[]
 }
 ```
