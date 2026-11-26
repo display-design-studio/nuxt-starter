@@ -15,7 +15,7 @@ useCacheTag(getHomeCacheTags(home.value))
 </script>
 
 <template>
-  <div>
+  <div v-if="home">
     <h1>{{ home.title }}</h1>
     <h2>
       Data:
