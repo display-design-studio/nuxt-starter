@@ -11,7 +11,7 @@ Implementation requires a separate explicit apply request. Deploying, publishing
 ## 2. Adapter boundary (Netlify only, no behavior change)
 
 - [x] 2.1 Extract the adapter interface and a Netlify adapter from `cacheHeaders.ts`, `responseCache.ts`, `cdnCache.ts`, the preview middleware, and `revalidate.post.ts`. Done as an isomorphic header adapter (`shared/cache/`) plus a server-only purge (`server/cache/purge.ts`), because shared code also runs in the client bundle and must not import provider SDKs. The build-time resolution (virtual module or alias) moves to 2.2 together with `NUXT_CACHE_PROVIDER`; until then `shared/cache/provider.ts` is the single selection point. Verify `bun test`, typecheck without Sanity env, and `verify-cache-build.mjs` pass unchanged and the built Netlify headers equal those of `main`.
-- [ ] 2.2 Add `NUXT_CACHE_PROVIDER` selection setting the preset, with unknown-value and preset-conflict failures. Verify tests for default, each supported value, unknown value, and conflict.
+- [x] 2.2 Add `NUXT_CACHE_PROVIDER` selection setting the preset, with unknown-value and preset-conflict failures. Done with a build-time constant (`__CACHE_PROVIDER__` through Vite `define` and Nitro `replace`, default `netlify`) instead of an alias, which bun tests cannot resolve. The preset is set only for an explicit provider, so the Docker `node-server` build and Netlify's own detection are unchanged. Only implemented providers are accepted; Vercel and Cloudflare are added with tasks 3 and 4. Verify tests for default, each supported value, unknown value, and conflict.
 - [ ] 2.3 Move page and sitemap route rules into the adapter. Verify the Netlify route rules are byte-identical to `main`.
 
 ## 3. Vercel adapter
