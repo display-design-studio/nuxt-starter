@@ -8,11 +8,15 @@ Let a project select its hosting provider while keeping one caching contract. De
 
 ### Requirement: The provider is selected explicitly at build time
 
-The system SHALL read the cache provider from `NUXT_CACHE_PROVIDER`, accepting `netlify`, `vercel`, and `cloudflare`, and SHALL default to `netlify` when unset. The selection SHALL determine the Nitro preset and the adapter used at runtime.
+The system SHALL read the cache provider from `NUXT_CACHE_PROVIDER`, accepting `netlify` and `vercel`, and SHALL default to `netlify` when unset. An explicit selection SHALL determine the Nitro preset, and the selection SHALL determine the adapter used at runtime.
 
 #### Scenario: Unset provider
 - **WHEN** the project is built without `NUXT_CACHE_PROVIDER`
-- **THEN** the Netlify adapter and Netlify preset are used and responses are identical to the behavior before this change
+- **THEN** the Netlify adapter is used, Nitro's own preset detection or an explicit `NITRO_PRESET` (for example the Docker `node-server` build) is left untouched, and responses are identical to the behavior before this change
+
+#### Scenario: Explicit provider
+- **WHEN** the project is built with a supported `NUXT_CACHE_PROVIDER` and no `NITRO_PRESET`
+- **THEN** that provider's Nitro preset is used
 
 #### Scenario: Unknown provider
 - **WHEN** the project is built with an unsupported `NUXT_CACHE_PROVIDER`

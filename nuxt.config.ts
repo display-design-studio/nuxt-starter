@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
+import { resolveCacheProvider } from './shared/cache/selection'
 import { DEFAULT_LOCALE, LOCALES } from './shared/utils/locales'
 import { getSitemapCacheRouteRules } from './shared/utils/sitemapCache'
 
@@ -13,6 +14,11 @@ const fallbackSanityTypesUrl = new URL(
   './shared/types/sanity.types.ts',
   import.meta.url,
 )
+
+const cacheProvider = resolveCacheProvider(process.env)
+const cacheProviderDefine = {
+  __CACHE_PROVIDER__: JSON.stringify(cacheProvider.id),
+}
 
 // Dev-only tooling lives in devDependencies and is not loaded by production builds.
 const devModules = process.env.NODE_ENV === 'production'
@@ -110,9 +116,18 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
 
   vite: {
+    define: cacheProviderDefine,
     plugins: [
       tailwindcss(),
     ],
+  },
+
+  nitro: {
+    // Only an explicit NUXT_CACHE_PROVIDER sets the preset; otherwise Nitro detects it as before.
+    ...(cacheProvider.preset
+      ? { preset: cacheProvider.preset }
+      : {}),
+    replace: cacheProviderDefine,
   },
 
   i18n: {
