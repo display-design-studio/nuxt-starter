@@ -52,7 +52,13 @@ try {
     assert.match(policy, /durable/)
     assert.doesNotMatch(policy, /stale-while-revalidate/)
     assert.ok(body.includes(marker))
-    if (!path.startsWith('/api/')) {
+    if (path.startsWith('/api/')) {
+      const expectedVary = path.includes('slug=')
+        ? 'query=lang|slug'
+        : 'query=lang'
+      assert.equal(response.headers.get('netlify-vary'), expectedVary, `${path}: cache key must ignore unrelated query parameters`)
+    }
+    else {
       assert.equal(response.headers.get('netlify-vary'), 'cookie=sanity-preview-id')
       assert.ok(body.includes('__NUXT_DATA__'), 'SSR result must be included in the hydration payload')
     }

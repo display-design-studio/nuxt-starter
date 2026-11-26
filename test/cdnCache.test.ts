@@ -28,6 +28,26 @@ describe('CDN cache headers', () => {
     expect(res.getHeader('Netlify-Cache-Tag')).toBe('doc:home,collection:page')
   })
 
+  test('restricts the CDN cache key to the declared query parameters', () => {
+    const { event, res } = createTestEvent()
+
+    setPublicCdnCache(event, ['doc:page'], {
+      queryParams: ['lang', 'slug'],
+    })
+
+    expect(res.getHeader('Netlify-Vary')).toBe('query=lang|slug')
+  })
+
+  test('does not set a query vary when caching is disabled', () => {
+    const { event, res } = createTestEvent()
+
+    setPublicCdnCache(event, [''], {
+      queryParams: ['lang'],
+    })
+
+    expect(res.getHeader('Netlify-Vary')).toBeUndefined()
+  })
+
   test('disables caching rather than omitting invalid dependency tags', () => {
     const { event, res } = createTestEvent()
 
