@@ -1,6 +1,6 @@
 # Design
 
-> Scope update (2026-11-26): Cloudflare is deferred to issue #48. The Cloudflare facts below are kept as research for that issue; decisions 3 and the Cloudflare tasks are not part of this change.
+> Scope update (2026-11-26): Vercel (#50) and Cloudflare (#48) are deferred. The provider facts below and decisions 3 and 3b are kept as research for those issues; this change delivers the adapter boundary, the Netlify adapter and build-time selection.
 
 ## Context
 
@@ -75,13 +75,9 @@ Netlify and Vercel have ISR; Cloudflare Workers does not (deferred, #48). Rather
 
 Cloudflare needs a different structure (Workers Caching, a gateway entrypoint for preview isolation and cache-key normalization, and per-adapter page retention route rules because Cloudflare has no Nitro `isr`). It is tracked in issue #48 with the research in Context. This change keeps the adapter boundary free of Netlify names so the provider can be added later, and does not move route rules into the adapter yet: only the page retention and sitemap periodic rules are provider-specific, and they differ only for Cloudflare.
 
-### 3b. Vercel: provider limits, purge semantics, and a spike before the adapter
+### 3b. Vercel is deferred
 
-The Vercel docs show differences that the contract must absorb, not paper over:
-- **Tag limits are per provider.** Vercel allows 128 tags and 256 bytes per tag, below the core's 500 tags and ids up to 256 characters (`doc:` plus the id). The adapter declares `limits: { maxTags, maxTagBytes }` and the neutral normalization uses them; exceeding a limit still disables caching rather than truncating.
-- **Purge semantics.** The contract says no stale window after a webhook. `invalidateByTag` serves stale content to the next visitor while revalidating; `dangerouslyDeleteByTag` makes the next request wait for the origin. The proposed default is delete, because tags here are document ids and a few collections, so the blast radius is small; owner decision below.
-- **Two structural options.** (A) the Nitro `isr` route rule plus `addCacheTag()` (needed because ISR functions cannot access raw response headers), or (B) header-based SSR caching: `Vercel-CDN-Cache-Control` and `Vercel-Cache-Tag` set on the response, with the page retention route rule per adapter (this brings task 2.3 back into scope for Vercel). Option B matches how tags are already set (`useCacheTag` writes a response header). Which works is unverified, so task 3.1 is a spike.
-- **Preview isolation and query key are unproven.** Cookies are not documented as part of the cache key and `Vary: Cookie` makes responses uncacheable, so a preview-cookie visitor could receive a cached public page; Vercel's own ISR bypass-cookie mechanism may cover it under option A. Cache keys are not configurable, so `queryKeyRestriction` is declared unsupported unless the spike shows otherwise.
+Vercel needs per-provider tag limits (128 tags and 256 bytes per tag against the core's 500), an owner choice between hard delete and `invalidateByTag`, and a spike on handler headers under the Nitro `isr` rule, preview-cookie isolation and the query-string cache key. All of it is tracked in issue #50 with the findings recorded in Context.
 
 ### 4. Selection is build-time and strict
 
@@ -94,11 +90,11 @@ The Vercel docs show differences that the contract must absorb, not paper over:
 ## Risks / Trade-offs
 
 - A Worker-error `stale-if-error` default serves stale indefinitely unless `must-revalidate` is present; the contract already sends it.
-- Two providers double the verification surface: mitigated by one parametrized harness and by keeping real-CDN checks as a gated checklist.
+- More providers multiply the verification surface: mitigated by one parametrized harness and by keeping real-CDN checks as a gated checklist (when providers are added).
 - Header names and purge APIs may change: confined to one adapter file per provider.
 
 ## Owner Decisions
 
-- Vercel purge semantics (open): hard delete (`dangerouslyDeleteByTag`, no stale window, proposed) or `invalidateByTag` (stale served once while revalidating, no stampede risk). To be confirmed before the Vercel adapter is implemented.
+- Vercel purge semantics (open, tracked in #50): hard delete (proposed) or `invalidateByTag`.
 - Nitro major (decided 2026-11-26): stay on Nitro 2 (`nitropack`) because Nitro 3 is still a release candidate (`^3.0.261103-rc`). The adapters target Nitro 2 and keep provider code free of v2-only APIs where practical. Migrating the starter to Nitro 3 is a separate OpenSpec change to open once Nitro 3 is stable, and is not part of this change.
-- Providers: Netlify and Vercel now; Cloudflare deferred to issue #48 (owner decision, 2026-11-26). Selection by build-time `NUXT_CACHE_PROVIDER`.
+- Providers: Netlify now; Vercel (#50) and Cloudflare (#48) deferred (owner decision, 2026-11-26). Selection by build-time `NUXT_CACHE_PROVIDER`.
