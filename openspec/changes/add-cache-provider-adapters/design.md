@@ -85,8 +85,7 @@ Whether Nitro's `cloudflare_module` output can expose the second entrypoint (cus
 - Three providers triple the verification surface: mitigated by one parametrized harness and by keeping real-CDN checks as a gated checklist.
 - Header names and purge APIs may change: confined to one adapter file per provider.
 
-## Open Decisions (owner)
+## Owner Decisions
 
-- Nitro major: implement the adapters on the Nitro 2 the starter uses today, or migrate the starter to Nitro 3 first as a separate OpenSpec change. Proposed default: Nitro 2 here, with adapter code kept free of v2-only APIs where practical, and the migration tracked separately because it affects the whole starter, not only caching.
-
-Otherwise none blocking the proposal. Per-provider purge credential names are proposed in tasks and confirmed when the adapter is implemented.
+- Nitro major (decided 2026-11-26): stay on Nitro 2 (`nitropack`) because Nitro 3 is still a release candidate (`^3.0.261103-rc`). The adapters target Nitro 2 and keep provider code free of v2-only APIs where practical. Migrating the starter to Nitro 3 is a separate OpenSpec change to open once Nitro 3 is stable, and is not part of this change.
+- Providers: Netlify, Vercel and Cloudflare. Selection by build-time `NUXT_CACHE_PROVIDER`.
