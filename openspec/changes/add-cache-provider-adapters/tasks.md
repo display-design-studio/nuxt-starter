@@ -6,7 +6,7 @@ Implementation requires a separate explicit apply request. Deploying, publishing
 
 - [ ] 1.1 Cloudflare is confirmed in `design.md` Context except the items listed as still unverified there. Confirm from official documentation, for Vercel (and the remaining Cloudflare items): CDN cache header, tag header, tag-purge API, required credentials, query/cookie vary support, and whether SSR responses are edge-cached. Record sources and unresolved items in `design.md`. Verify each Unverified fact in Context is either confirmed with a source or listed as an open risk.
 
-- [ ] 1.2 On Nitro 2 (decided), confirm for each provider each provider's preset name, how `cloudflare:workers` imports resolve in the build, and how route rules and the `nitro:init` hook behave. Verify by a successful build for each provider preset on that Nitro major.
+- [ ] 1.2 On Nitro 2 (decided), confirm each provider's preset name, how `cloudflare:workers` imports resolve in the build, and how route rules and the `nitro:init` hook behave. Verify by a successful build for each provider preset on that Nitro major.
 
 ## 2. Adapter boundary (Netlify only, no behavior change)
 
