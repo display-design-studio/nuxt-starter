@@ -1,6 +1,6 @@
 import type { H3Event } from 'h3'
 import { setResponseHeader } from 'h3'
-import { noStoreHeaders, publicContentCacheHeaders, queryVaryHeader } from '../../shared/utils/cacheHeaders'
+import { cacheProvider } from '../../shared/cache/provider'
 import { addResponseCacheTags, disableResponseCache } from '../../shared/utils/responseCache'
 
 export function setPublicCdnCache(
@@ -11,10 +11,7 @@ export function setPublicCdnCache(
   if (!addResponseCacheTags(event, tags))
     return
 
-  if (options.queryParams)
-    setResponseHeader(event, 'Netlify-Vary', queryVaryHeader(options.queryParams))
-
-  for (const [name, value] of Object.entries(publicContentCacheHeaders))
+  for (const [name, value] of Object.entries(cacheProvider.publicHeaders({ queryParams: options.queryParams })))
     setResponseHeader(event, name, value)
 }
 
@@ -24,6 +21,6 @@ export function setNoStore(event: H3Event, options: { provisional?: boolean } = 
     disableResponseCache(event)
     return
   }
-  for (const [name, value] of Object.entries(noStoreHeaders))
+  for (const [name, value] of Object.entries(cacheProvider.noStoreHeaders))
     setResponseHeader(event, name, value)
 }

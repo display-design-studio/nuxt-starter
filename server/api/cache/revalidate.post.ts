@@ -1,5 +1,5 @@
-import { purgeCache } from '@netlify/functions'
 import { isValidSignature } from '@sanity/webhook'
+import { purgeCacheTags } from '../../cache/purge'
 
 /**
  * Sanity webhook handler for on-demand Netlify cache invalidation.
@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
     return new Response('Ignored unpublished document', { status: 200 })
 
   try {
-    await purgeCache({ tags })
+    await purgeCacheTags(tags)
   }
   catch {
     // The SDK throws on network errors and non-2xx responses, including 429.
