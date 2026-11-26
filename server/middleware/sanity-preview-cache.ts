@@ -20,7 +20,10 @@ export default defineEventHandler((event) => {
   }
 
   const config = useRuntimeConfig(event)
-  const previewModeId = config.sanity?.visualEditing?.previewModeId
+  // The module only augments this type when visual editing is configured
+  // (token present), so read it through an explicit shape.
+  const sanityConfig = config.sanity as { visualEditing?: { previewModeId?: string } } | undefined
+  const previewModeId = sanityConfig?.visualEditing?.previewModeId
   const isPreview = Boolean(
     previewModeId && cookies['sanity-preview-id'] === previewModeId,
   )
